@@ -1,0 +1,1127 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON RUSH 3D — Racing</title>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  overflow:hidden;
+  background:#83c9ed;
+  font-family:Arial,sans-serif;
+  color:white;
+}
+canvas{display:block}
+#game{position:fixed;inset:0}
+.hud{
+  position:fixed;
+  left:25px;top:25px;
+  width:220px;
+  padding:16px;
+  border-radius:18px;
+  background:rgba(15,25,37,.88);
+  border:1px solid #ffffff30;
+  backdrop-filter:blur(12px);
+  z-index:5;
+  box-shadow:0 10px 35px #0004;
+}
+.hud-line{
+  display:flex;
+  justify-content:space-between;
+  padding:9px 0;
+  border-bottom:1px solid #ffffff20;
+  font-weight:bold;
+  font-size:13px;
+}
+.hud-line:last-child{border:0}
+.hud-line span:first-child{color:#a5b2c1}
+.cyan{color:#12d9f0}
+.green{color:#36d9a0}
+.yellow{color:#ffce48}
+.orange{color:#ff9a30}
+.stats{
+  position:fixed;
+  left:25px;top:245px;
+  background:#172331e8;
+  border-radius:17px;
+  width:220px;
+  padding:15px;
+  z-index:5;
+  border:1px solid #ffffff30;
+}
+.stats-row{display:flex;justify-content:space-between}
+.stats small{color:#a6b3c1;font-weight:bold}
+.stats strong{display:block;font-size:23px;margin-top:7px}
+.nitro{
+  margin-top:13px;
+  background:#172331e8;
+  padding:14px;
+  border-radius:14px;
+}
+.nitro-head{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:9px;
+}
+.nitro-track{
+  height:10px;
+  background:#394250;
+  border-radius:20px;
+  overflow:hidden;
+}
+#nitroBar{
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,#ff9a00,#ff315e);
+  border-radius:20px;
+}
+.top-buttons{
+  position:fixed;
+  right:25px;top:25px;
+  display:flex;gap:10px;
+  z-index:8;
+}
+.top-buttons button{
+  border:1px solid #ffffff30;
+  background:#151d28e8;
+  color:white;
+  border-radius:14px;
+  padding:14px 16px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.top-buttons button:hover{background:#00abc5}
+.overlay{
+  position:fixed;inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#07101b9c;
+  z-index:20;
+  backdrop-filter:blur(7px);
+}
+.panel{
+  width:min(90%,470px);
+  padding:35px;
+  background:#101d2b;
+  border:1px solid #ffffff30;
+  border-radius:25px;
+  text-align:center;
+  box-shadow:0 20px 70px #0007;
+}
+.panel h1{
+  font-size:39px;
+  margin:5px 0;
+  font-weight:900;
+}
+.panel h1 span{color:#16d7e9}
+.panel p{color:#a8b9c9;line-height:1.6}
+.main-btn{
+  border:0;
+  background:linear-gradient(100deg,#00bed4,#27e2c0);
+  color:#06131c;
+  padding:16px 28px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+  margin-top:15px;
+}
+.main-btn:hover{transform:scale(1.04)}
+.hidden{display:none!important}
+#countdown{
+  position:fixed;
+  top:40%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:10;
+  text-align:center;
+  pointer-events:none;
+}
+#countNumber{
+  font-size:85px;
+  font-weight:1000;
+  color:#36dcaa;
+  text-shadow:0 4px 35px #00ffb477;
+}
+.lights{
+  display:flex;
+  gap:12px;
+  padding:17px 23px;
+  background:#182332e8;
+  border-radius:20px;
+  margin-bottom:15px;
+}
+.light{
+  width:29px;height:29px;
+  background:#43515d;
+  border-radius:50%;
+}
+.light.active{
+  background:#30d9a0;
+  box-shadow:0 0 25px #30d9a0;
+}
+#countText{font-weight:1000;font-size:65px;color:#30d9a0}
+#bottomControls{
+  position:fixed;
+  bottom:25px;left:25px;right:25px;
+  display:flex;justify-content:space-between;
+  pointer-events:none;
+  z-index:8;
+}
+.touch-group{display:flex;gap:12px;pointer-events:auto}
+.touch-btn{
+  width:65px;height:65px;
+  border:1px solid #ffffff44;
+  background:#152436bb;
+  color:white;
+  border-radius:18px;
+  font-size:25px;
+  touch-action:none;
+}
+.touch-btn:active{background:#00afc6}
+#finishInfo{font-size:24px;color:#39dbaa;font-weight:900}
+@media(max-width:600px){
+  .hud{left:10px;top:10px;width:175px;padding:10px}
+  .hud-line{font-size:11px;padding:6px 0}
+  .stats{left:10px;top:205px;width:175px;padding:10px}
+  .top-buttons{right:10px;top:10px;gap:5px}
+  .top-buttons button{padding:10px;font-size:11px}
+  .panel{padding:22px}
+  .panel h1{font-size:30px}
+  #bottomControls{bottom:12px;left:10px;right:10px}
+  .touch-btn{width:55px;height:55px}
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<!-- HUD -->
+<div class="hud">
+  <div class="hud-line">
+    <span>O‘RIN</span>
+    <span class="cyan" id="position">6/6</span>
+  </div>
+  <div class="hud-line">
+    <span>MASOFA</span>
+    <span class="green" id="distance">0/3.6 km</span>
+  </div>
+  <div class="hud-line">
+    <span>VAQT</span>
+    <span class="yellow" id="timer">00:00.00</span>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stats-row">
+    <div>
+      <small>BALL</small>
+      <strong class="green" id="score">0</strong>
+    </div>
+    <div>
+      <small>TEZLIK</small>
+      <strong class="cyan"><span id="speed">0</span> <small>km/s</small></strong>
+    </div>
+  </div>
+
+  <div class="nitro">
+    <div class="nitro-head">
+      <span class="orange">🔥 NITRO (SPACE)</span>
+      <span id="nitroPercent">100%</span>
+    </div>
+    <div class="nitro-track">
+      <div id="nitroBar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Buttons -->
+<div class="top-buttons">
+  <button id="cameraBtn">📹 Orqadan</button>
+  <button id="soundBtn">🔊</button>
+  <button id="pauseBtn">Ⅱ</button>
+</div>
+
+<!-- Touch controls -->
+<div id="bottomControls">
+  <div class="touch-group">
+    <button class="touch-btn" data-key="ArrowLeft">◀</button>
+    <button class="touch-btn" data-key="ArrowRight">▶</button>
+  </div>
+  <div class="touch-group">
+    <button class="touch-btn" data-key="Space">🔥</button>
+  </div>
+</div>
+
+<!-- Start screen -->
+<div class="overlay" id="startScreen">
+  <div class="panel">
+    <h1>NEON <span>RUSH 3D</span></h1>
+    <p>Haqiqiy 3D avtomobil poygasi!</p>
+    <p>5 ta bot-raqib bilan bellashing.<br>
+    Nitro ishlating va marraga birinchi yetib boring.</p>
+    <button class="main-btn" id="startBtn">🏁 POYGANI BOSHLASH</button>
+  </div>
+</div>
+
+<!-- Countdown -->
+<div id="countdown" class="hidden">
+  <div class="lights">
+    <div class="light"></div>
+    <div class="light"></div>
+    <div class="light"></div>
+  </div>
+  <div id="countNumber">3</div>
+</div>
+
+<!-- Pause -->
+<div class="overlay hidden" id="pauseScreen">
+  <div class="panel">
+    <h1>PAUZA</h1>
+    <p>O‘yin vaqtincha to‘xtatildi.</p>
+    <button class="main-btn" id="continueBtn">▶ DAVOM ETISH</button>
+  </div>
+</div>
+
+<!-- Finish -->
+<div class="overlay hidden" id="finishScreen">
+  <div class="panel">
+    <h1 id="finishTitle">🏆 FINISH!</h1>
+    <p id="finishInfo"></p>
+    <p id="finalScore"></p>
+    <button class="main-btn" id="againBtn">🔄 QAYTA O‘YNASH</button>
+    <h3>TOP 10 REKORD</h3>
+    <div id="leaderboard"></div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* =========================
+   1. ASOSIY SOZLAMALAR
+========================= */
+
+const game=document.getElementById('game');
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x9bd6f5);
+scene.fog=new THREE.Fog(0x9bd6f5,100,450);
+
+const camera=new THREE.PerspectiveCamera(
+  65,window.innerWidth/window.innerHeight,.1,2500
+);
+
+const renderer=new THREE.WebGLRenderer({
+  antialias:true
+});
+
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+game.appendChild(renderer.domElement);
+
+/* Yorug‘lik */
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x627b49,2));
+
+const sun=new THREE.DirectionalLight(0xffffff,2.2);
+sun.position.set(-70,100,50);
+sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+scene.add(sun);
+
+/* =========================
+   2. YO‘L VA TABIAT
+========================= */
+
+const ground=new THREE.Mesh(
+  new THREE.PlaneGeometry(600,3000),
+  new THREE.MeshStandardMaterial({color:0x507d39})
+);
+ground.rotation.x=-Math.PI/2;
+ground.position.set(0,-.12,-850);
+ground.receiveShadow=true;
+scene.add(ground);
+
+const road=new THREE.Mesh(
+  new THREE.PlaneGeometry(24,2400),
+  new THREE.MeshStandardMaterial({
+    color:0x777d83,
+    roughness:.95
+  })
+);
+road.rotation.x=-Math.PI/2;
+road.position.set(0,0,-850);
+road.receiveShadow=true;
+scene.add(road);
+
+/* Yo‘l chiziqlari */
+
+const whiteMat=new THREE.MeshStandardMaterial({color:0xffffff});
+
+for(let x of [-7.2,-2.4,2.4,7.2]){
+  for(let z=25;z>-2050;z-=32){
+    const line=new THREE.Mesh(
+      new THREE.BoxGeometry(.18,.035,10),
+      whiteMat
+    );
+    line.position.set(x,.025,z);
+    scene.add(line);
+  }
+}
+
+/* Yo‘l chetlari */
+
+const curbColors=[0xffffff,0xe52c32];
+
+for(let side of [-1,1]){
+  for(let z=25;z>-2050;z-=8){
+    const curb=new THREE.Mesh(
+      new THREE.BoxGeometry(1.0,.35,8),
+      new THREE.MeshStandardMaterial({
+        color:curbColors[Math.floor(Math.abs(z/8))%2]
+      })
+    );
+    curb.position.set(side*12.2,.15,z);
+    curb.castShadow=true;
+    scene.add(curb);
+  }
+
+  const rail=new THREE.Mesh(
+    new THREE.BoxGeometry(.25,.6,2200),
+    new THREE.MeshStandardMaterial({color:0xd4d8db})
+  );
+  rail.position.set(side*13,.6,-900);
+  scene.add(rail);
+}
+
+/* Tog‘lar va manzara */
+
+for(let i=0;i<95;i++){
+  const side=Math.random()<.5?-1:1;
+  const height=15+Math.random()*35;
+  const mountain=new THREE.Mesh(
+    new THREE.ConeGeometry(12+Math.random()*25,height,5),
+    new THREE.MeshStandardMaterial({
+      color:[0x71807c,0x8b8a83,0x455d3e][i%3]
+    })
+  );
+  mountain.position.set(
+    side*(30+Math.random()*90),
+    height/2-1,
+    -Math.random()*1900
+  );
+  mountain.rotation.y=Math.random()*3;
+  scene.add(mountain);
+}
+
+/* =========================
+   3. AVTOMOBIL MODELI
+========================= */
+
+function createCar(color,isPlayer=false){
+
+  const car=new THREE.Group();
+
+  const bodyMat=new THREE.MeshStandardMaterial({
+    color,
+    metalness:.45,
+    roughness:.3
+  });
+
+  const black=new THREE.MeshStandardMaterial({
+    color:0x111827,
+    roughness:.65
+  });
+
+  const glass=new THREE.MeshStandardMaterial({
+    color:0x18374a,
+    metalness:.4,
+    roughness:.2
+  });
+
+  function box(w,h,d,x,y,z,mat){
+    const m=new THREE.Mesh(
+      new THREE.BoxGeometry(w,h,d),
+      mat
+    );
+    m.position.set(x,y,z);
+    m.castShadow=true;
+    m.receiveShadow=true;
+    car.add(m);
+    return m;
+  }
+
+  /* Korpus */
+
+  box(2.25,.65,4.3,0,.7,0,bodyMat);
+
+  /* Kapot */
+
+  box(1.95,.18,1.1,0,1.03,-1.45,bodyMat);
+
+  /* Kabina */
+
+  box(1.62,.9,2.05,0,1.38,.05,glass);
+
+  /* Tom */
+
+  box(1.68,.13,1.7,0,1.85,.05,bodyMat);
+
+  /* Old va orqa oynalar */
+
+  box(1.35,.48,.07,0,1.42,-1.0,glass);
+  box(1.35,.45,.07,0,1.42,1.08,glass);
+
+  /* Orqa chiroqlar */
+
+  box(.44,.25,.08,-.79,.76,2.2,
+    new THREE.MeshStandardMaterial({color:0xff143f,emissive:0x710019})
+  );
+
+  box(.44,.25,.08,.79,.76,2.2,
+    new THREE.MeshStandardMaterial({color:0xff143f,emissive:0x710019})
+  );
+
+  /* Old chiroqlar */
+
+  box(.4,.16,.08,-.78,.8,-2.2,
+    new THREE.MeshStandardMaterial({color:0xffffdd,emissive:0x999966})
+  );
+
+  box(.4,.16,.08,.78,.8,-2.2,
+    new THREE.MeshStandardMaterial({color:0xffffdd,emissive:0x999966})
+  );
+
+  /* Raqam */
+
+  box(1,.28,.06,0,.48,2.23,
+    new THREE.MeshStandardMaterial({color:0xffffff})
+  );
+
+  /* G‘ildiraklar */
+
+  const wheelGeo=new THREE.CylinderGeometry(.43,.43,.28,20);
+
+  for(let x of [-1.12,1.12]){
+    for(let z of [-1.35,1.35]){
+      const wheel=new THREE.Mesh(wheelGeo,black);
+      wheel.rotation.z=Math.PI/2;
+      wheel.position.set(x,.42,z);
+      wheel.castShadow=true;
+      car.add(wheel);
+    }
+  }
+
+  if(isPlayer){
+    const spoiler=box(2.0,.12,.32,0,1.18,1.8,black);
+    spoiler.rotation.x=-.08;
+  }
+
+  return car;
+}
+
+/* O‘yinchi avtomobili */
+
+const player=createCar(0x079bc8,true);
+player.position.set(0,0,0);
+scene.add(player);
+
+/* =========================
+   4. BOTLAR
+========================= */
+
+const botColors=[
+  0xe83e57,
+  0x1c2bdb,
+  0xffa52c,
+  0x20b98b,
+  0x8b52dc
+];
+
+const lanes=[-8,-4,0,4,8];
+
+const bots=[];
+
+for(let i=0;i<5;i++){
+
+  const car=createCar(botColors[i]);
+
+  const bot={
+    car,
+    progress:20+i*15,
+    x:lanes[i],
+    targetX:lanes[i],
+    speed:155+Math.random()*90,
+    changeTime:2+Math.random()*4,
+    overtaken:false
+  };
+
+  car.position.set(bot.x,0,-bot.progress);
+
+  scene.add(car);
+  bots.push(bot);
+}
+
+/* Botlar harakatlanadigan yo‘laklar */
+
+function chooseLane(bot){
+  let choices=lanes.filter(l=>Math.abs(l-bot.x)>2.5);
+  bot.targetX=choices[Math.floor(Math.random()*choices.length)];
+  bot.changeTime=2+Math.random()*4;
+}
+
+/* =========================
+   5. MARRA CHIZIG‘I
+========================= */
+
+const finishGroup=new THREE.Group();
+
+for(let row=0;row<2;row++){
+  for(let col=0;col<18;col++){
+    const tile=new THREE.Mesh(
+      new THREE.BoxGeometry(24/18,.06,1.5),
+      new THREE.MeshStandardMaterial({
+        color:(row+col)%2===0?0xffffff:0x111111
+      })
+    );
+    tile.position.set(
+      -12+col*(24/18)+24/36,
+      .05,
+      -1800+row*.75
+    );
+    finishGroup.add(tile);
+  }
+}
+
+scene.add(finishGroup);
+
+/* =========================
+   6. O‘YIN HOLATI
+========================= */
+
+const FINISH_DISTANCE=1800;
+
+let mode='menu';
+let distance=0;
+let speed=0;
+let score=0;
+let nitro=100;
+let elapsed=0;
+let countdown=3;
+let countdownElapsed=0;
+let paused=false;
+let nitroActive=false;
+let muted=false;
+let cameraFar=false;
+let collisionCooldown=0;
+let overtakes=0;
+
+const keys={};
+
+function formatTime(sec){
+  const m=Math.floor(sec/60);
+  const s=Math.floor(sec%60);
+  const cs=Math.floor((sec%1)*100);
+
+  return String(m).padStart(2,'0')+':'+
+         String(s).padStart(2,'0')+'.'+
+         String(cs).padStart(2,'0');
+}
+
+function getRank(){
+  return 1+bots.filter(b=>b.progress>distance).length;
+}
+
+function updateHUD(){
+
+  const rank=getRank();
+
+  document.getElementById('position').textContent=rank+'/6';
+
+  document.getElementById('distance').textContent=
+    (distance/500).toFixed(1)+'/3.6 km';
+
+  document.getElementById('timer').textContent=
+    formatTime(elapsed);
+
+  document.getElementById('score').textContent=
+    Math.floor(score);
+
+  document.getElementById('speed').textContent=
+    Math.round(speed);
+
+  document.getElementById('nitroBar').style.width=
+    nitro+'%';
+
+  document.getElementById('nitroPercent').textContent=
+    Math.round(nitro)+'%';
+}
+
+/* =========================
+   7. OVOZ
+========================= */
+
+let audioContext;
+
+function beep(freq=400,duration=.1){
+  if(muted)return;
+
+  try{
+    audioContext=audioContext||new(
+      window.AudioContext||window.webkitAudioContext
+    )();
+
+    const oscillator=audioContext.createOscillator();
+    const gain=audioContext.createGain();
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.frequency.value=freq;
+    gain.gain.value=.04;
+
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime+duration);
+  }catch(e){}
+}
+
+/* =========================
+   8. BOSHLASH
+========================= */
+
+function resetRace(){
+
+  distance=0;
+  speed=0;
+  score=0;
+  nitro=100;
+  elapsed=0;
+  overtakes=0;
+  collisionCooldown=0;
+
+  player.position.set(0,0,0);
+  player.rotation.set(0,0,0);
+
+  for(let i=0;i<bots.length;i++){
+
+    const bot=bots[i];
+
+    bot.progress=20+i*15;
+    bot.x=lanes[i];
+    bot.targetX=lanes[i];
+    bot.speed=155+Math.random()*90;
+    bot.changeTime=2+Math.random()*4;
+    bot.overtaken=false;
+
+    bot.car.position.set(bot.x,0,-bot.progress);
+  }
+
+  document.getElementById('finishScreen').classList.add('hidden');
+  updateHUD();
+}
+
+function startRace(){
+
+  resetRace();
+
+  mode='countdown';
+  countdown=3;
+  countdownElapsed=0;
+
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('pauseScreen').classList.add('hidden');
+  document.getElementById('countdown').classList.remove('hidden');
+
+  document.querySelectorAll('.light').forEach(l=>{
+    l.classList.remove('active');
+  });
+}
+
+/* =========================
+   9. PAUZA
+========================= */
+
+function togglePause(){
+
+  if(mode!=='race'&&mode!=='paused')return;
+
+  if(mode==='race'){
+    mode='paused';
+    document.getElementById('pauseScreen').classList.remove('hidden');
+  }else{
+    mode='race';
+    document.getElementById('pauseScreen').classList.add('hidden');
+  }
+}
+
+/* =========================
+   10. BOTLAR VA TO‘QNASHUV
+========================= */
+
+function updateBots(dt){
+
+  for(const bot of bots){
+
+    const oldProgress=bot.progress;
+
+    bot.progress+=bot.speed*dt/7.2;
+
+    bot.changeTime-=dt;
+
+    if(bot.changeTime<=0){
+      chooseLane(bot);
+    }
+
+    bot.x+=(bot.targetX-bot.x)*Math.min(1,dt*1.2);
+
+    bot.car.position.set(bot.x,0,-bot.progress);
+
+    bot.car.rotation.z=
+      (bot.targetX-bot.x)*-.018;
+
+    if(bot.progress>distance+3 &&
+       bot.progress<distance+12 &&
+       !bot.overtaken){
+      bot.overtaken=true;
+    }
+
+    if(bot.progress<distance-5){
+      bot.overtaken=false;
+    }
+  }
+
+  /* To‘qnashuv */
+
+  if(collisionCooldown>0){
+    collisionCooldown-=dt;
+  }
+
+  for(const bot of bots){
+
+    const closeDistance=
+      Math.abs(bot.progress-distance)<3.5;
+
+    const closeX=
+      Math.abs(bot.x-player.position.x)<2.3;
+
+    if(closeDistance&&closeX&&collisionCooldown<=0){
+
+      speed*=.35;
+      score=Math.max(0,score-100);
+      collisionCooldown=1.2;
+
+      beep(100,.2);
+
+      player.position.x+=
+        player.position.x<bot.x?-1.2:1.2;
+
+      player.position.x=Math.max(-9,Math.min(9,player.position.x));
+    }
+  }
+}
+
+/* =========================
+   11. O‘YINNI YAKUNLASH
+========================= */
+
+function finishRace(){
+
+  mode='done';
+
+  const rank=getRank();
+  const finalScore=Math.floor(score+overtakes*300);
+
+  document.getElementById('finishTitle').textContent=
+    rank===1?'🏆 SIZ G‘OLIBSIZ!':'🏁 POYGA YAKUNLANDI';
+
+  document.getElementById('finishInfo').textContent=
+    'O‘rningiz: '+rank+'/6';
+
+  document.getElementById('finalScore').textContent=
+    'Ball: '+finalScore+' | Vaqt: '+formatTime(elapsed);
+
+  saveRecord(finalScore,rank);
+  document.getElementById('finishScreen').classList.remove('hidden');
+
+  beep(700,.4);
+}
+
+function saveRecord(points,rank){
+
+  let records=[];
+
+  try{
+    records=JSON.parse(localStorage.getItem('neon3DRecords')||'[]');
+  }catch(e){
+    records=[];
+  }
+
+  records.push({
+    score:points,
+    rank,
+    date:new Date().toLocaleDateString('uz-UZ')
+  });
+
+  records.sort((a,b)=>b.score-a.score);
+  records=records.slice(0,10);
+
+  localStorage.setItem('neon3DRecords',JSON.stringify(records));
+
+  document.getElementById('leaderboard').innerHTML=
+    records.map((r,i)=>`
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        padding:8px;
+        border-bottom:1px solid #ffffff20;
+        font-size:13px">
+        <span>${i+1}. ${r.date}</span>
+        <span>🏆 ${r.score}</span>
+      </div>
+    `).join('');
+}
+
+/* =========================
+   12. O‘YIN FIZIKASI
+========================= */
+
+function updateRace(dt){
+
+  elapsed+=dt;
+
+  const accelerating=keys.KeyW||keys.ArrowUp;
+  const braking=keys.KeyS||keys.ArrowDown;
+  const left=keys.KeyA||keys.ArrowLeft;
+  const right=keys.KeyD||keys.ArrowRight;
+
+  nitroActive=keys.Space&&nitro>0;
+
+  const maxSpeed=nitroActive?300:240;
+
+  if(accelerating){
+    speed+=115*dt;
+  }else{
+    speed-=30*dt;
+  }
+
+  if(braking){
+    speed-=180*dt;
+  }
+
+  if(nitroActive){
+
+    speed+=155*dt;
+    nitro-=34*dt;
+  }else{
+    nitro+=11*dt;
+  }
+
+  speed=Math.max(0,Math.min(maxSpeed,speed));
+  nitro=Math.max(0,Math.min(100,nitro));
+
+  /* Chap va o‘ng boshqaruv */
+
+  let steer=0;
+
+  if(left)steer=-1;
+  if(right)steer=1;
+
+  const steeringSpeed=10+(speed/240)*8;
+
+  player.position.x+=steer*steeringSpeed*dt;
+
+  player.position.x=Math.max(-9,Math.min(9,player.position.x));
+
+  player.rotation.z=-steer*.13;
+  player.rotation.y=-steer*.045;
+
+  /* Oldinga harakat */
+
+  distance+=speed*dt/7.2;
+
+  player.position.z=-distance;
+
+  /* Botlar */
+
+  updateBots(dt);
+
+  /* Ball */
+
+  score+=speed*dt*.12;
+
+  /* O‘rin va masofa */
+
+  updateHUD();
+
+  if(distance>=FINISH_DISTANCE){
+    distance=FINISH_DISTANCE;
+    updateHUD();
+    finishRace();
+  }
+}
+
+/* =========================
+   13. KAMERA
+========================= */
+
+function updateCamera(dt){
+
+  const close=cameraFar?1:0;
+
+  const cameraX=player.position.x*.55;
+  const cameraY=cameraFar?10:6.8;
+  const cameraZ=player.position.z+(cameraFar?18:12.5);
+
+  camera.position.x+=
+    (cameraX-camera.position.x)*Math.min(1,dt*4);
+
+  camera.position.y+=
+    (cameraY-camera.position.y)*Math.min(1,dt*3);
+
+  camera.position.z+=
+    (cameraZ-camera.position.z)*Math.min(1,dt*4);
+
+  camera.lookAt(
+    player.position.x*.3,
+    1.0,
+    player.position.z-12
+  );
+}
+
+/* =========================
+   14. TUGMALAR
+========================= */
+
+document.addEventListener('keydown',e=>{
+
+  keys[e.code]=true;
+
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)){
+    e.preventDefault();
+  }
+
+  if(e.code==='Escape'||e.code==='KeyP'){
+    togglePause();
+  }
+});
+
+document.addEventListener('keyup',e=>{
+  keys[e.code]=false;
+});
+
+document.querySelectorAll('[data-key]').forEach(button=>{
+
+  const key=button.dataset.key;
+
+  button.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    keys[key==='Space'?'Space':key]=true;
+  });
+
+  ['pointerup','pointerleave','pointercancel'].forEach(event=>{
+    button.addEventListener(event,()=>{
+      keys[key==='Space'?'Space':key]=false;
+    });
+  });
+});
+
+document.getElementById('startBtn').onclick=startRace;
+document.getElementById('againBtn').onclick=startRace;
+
+document.getElementById('pauseBtn').onclick=togglePause;
+document.getElementById('continueBtn').onclick=togglePause;
+
+document.getElementById('cameraBtn').onclick=()=>{
+  cameraFar=!cameraFar;
+  document.getElementById('cameraBtn').textContent=
+    cameraFar?'📹 Uzoq kamera':'📹 Orqadan';
+};
+
+document.getElementById('soundBtn').onclick=()=>{
+  muted=!muted;
+  document.getElementById('soundBtn').textContent=
+    muted?'🔇':'🔊';
+};
+
+/* =========================
+   15. O‘YIN SIKLI
+========================= */
+
+let lastTime=0;
+
+function animate(now){
+
+  requestAnimationFrame(animate);
+
+  const dt=Math.min((now-lastTime)/1000,.05);
+  lastTime=now;
+
+  if(mode==='countdown'){
+
+    countdownElapsed+=dt;
+
+    const step=Math.floor(countdownElapsed);
+
+    document.getElementById('countNumber').textContent=
+      Math.max(1,3-step);
+
+    document.querySelectorAll('.light').forEach((light,i)=>{
+      light.classList.toggle('active',i<=step);
+    });
+
+    if(step>=3){
+      mode='race';
+      document.getElementById('countdown').classList.add('hidden');
+      beep(850,.3);
+    }
+  }
+
+  if(mode==='race'){
+    updateRace(dt);
+  }
+
+  updateCamera(dt);
+
+  renderer.render(scene,camera);
+}
+
+requestAnimationFrame(animate);
+
+/* =========================
+   16. EKRAN O‘LCHAMI
+========================= */
+
+window.addEventListener('resize',()=>{
+
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+});
+
+updateHUD();
+
+</script>
+</body>
+</html>
