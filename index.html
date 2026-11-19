@@ -1,2496 +1,1127 @@
+
 <!DOCTYPE html>
-<html lang="uz" data-theme="serika_dark">
+<html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monkeytype | Minimalist Typing Test & Rekordlar</title>
-    <!-- Roboto Mono & Lexend Deca shriftlari -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;600;700&family=Roboto+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <style>
-        /* =========================================
-           1. MONKEYTYPE THEMES & CSS VARIABLES
-           ========================================= */
-        :root, [data-theme="serika_dark"] {
-            --bg-color: #323437;
-            --main-color: #e2b714;
-            --caret-color: #e2b714;
-            --sub-color: #646669;
-            --sub-alt-color: #2c2e31;
-            --text-color: #d1d0c5;
-            --error-color: #ca4754;
-            --error-extra-color: #7e2a33;
-            --colorful-error-color: #ca4754;
-        }
-
-        [data-theme="dracula"] {
-            --bg-color: #282a36;
-            --main-color: #bd93f9;
-            --caret-color: #bd93f9;
-            --sub-color: #6272a4;
-            --sub-alt-color: #21222c;
-            --text-color: #f8f8f2;
-            --error-color: #ff5555;
-            --error-extra-color: #a13434;
-        }
-
-        [data-theme="nord"] {
-            --bg-color: #2e3440;
-            --main-color: #88c0d0;
-            --caret-color: #88c0d0;
-            --sub-color: #4c566a;
-            --sub-alt-color: #242933;
-            --text-color: #eceff4;
-            --error-color: #bf616a;
-            --error-extra-color: #793e44;
-        }
-
-        [data-theme="botanical"] {
-            --bg-color: #7b9c98;
-            --main-color: #eaf1f3;
-            --caret-color: #eaf1f3;
-            --sub-color: #495755;
-            --sub-alt-color: #6c8a86;
-            --text-color: #eaf1f3;
-            --error-color: #f6c9b4;
-            --error-extra-color: #c28d76;
-        }
-
-        [data-theme="matrix"] {
-            --bg-color: #000000;
-            --main-color: #15ff00;
-            --caret-color: #15ff00;
-            --sub-color: #006500;
-            --sub-alt-color: #0a140a;
-            --text-color: #d1ffcd;
-            --error-color: #da3333;
-            --error-extra-color: #791717;
-        }
-
-        [data-theme="light"] {
-            --bg-color: #e1e1e3;
-            --main-color: #d69e00;
-            --caret-color: #d69e00;
-            --sub-color: #8e8e93;
-            --sub-alt-color: #d1d1d6;
-            --text-color: #1c1c1e;
-            --error-color: #d70015;
-            --error-extra-color: #8a000d;
-        }
-
-        /* =========================================
-           2. GLOBAL RESET & BASE STYLES
-           ========================================= */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Roboto Mono', monospace;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: background-color 0.25s ease, color 0.25s ease;
-            overflow-x: hidden;
-            user-select: none;
-        }
-
-        /* Focus mode: typing boshlanganda header/footer xiralashadi */
-        body.focus-mode header .nav-links,
-        body.focus-mode header .user-controls,
-        body.focus-mode #test-config-bar,
-        body.focus-mode footer {
-            opacity: 0.12;
-            pointer-events: none;
-        }
-
-        header .nav-links, header .user-controls, #test-config-bar, footer {
-            transition: opacity 0.3s ease;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            padding: 2rem 2.5rem;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            justify-content: space-between;
-        }
-
-        button {
-            background: none;
-            border: none;
-            color: var(--sub-color);
-            font-family: inherit;
-            cursor: pointer;
-            transition: color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            border-radius: 0.5rem;
-        }
-
-        button:hover {
-            color: var(--text-color);
-        }
-
-        button.active {
-            color: var(--main-color);
-        }
-
-        svg {
-            width: 1.15rem;
-            height: 1.15rem;
-            fill: currentColor;
-        }
-
-        /* =========================================
-           3. TOP NAVIGATION HEADER
-           ========================================= */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1.75rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.65rem;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            color: var(--main-color);
-            width: 2.3rem;
-            height: 2.3rem;
-            transition: transform 0.2s ease;
-        }
-
-        .logo:hover .logo-icon {
-            transform: scale(1.06);
-        }
-
-        .logo-text-wrap {
-            display: flex;
-            flex-direction: column;
-            line-height: 1;
-        }
-
-        .logo-sub {
-            font-size: 0.65rem;
-            color: var(--sub-color);
-            letter-spacing: 0.05em;
-            margin-bottom: 2px;
-        }
-
-        .logo-title {
-            font-family: 'Lexend Deca', sans-serif;
-            font-size: 1.75rem;
-            font-weight: 600;
-            color: var(--text-color);
-            letter-spacing: -0.03em;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .nav-btn {
-            padding: 0.55rem 0.75rem;
-            font-size: 0.9rem;
-            position: relative;
-        }
-
-        .nav-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: 2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background-color: var(--main-color);
-        }
-
-        .user-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .user-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.45rem 0.85rem;
-            background-color: var(--sub-alt-color);
-            border-radius: 0.5rem;
-            font-size: 0.85rem;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: border-color 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .user-badge:hover {
-            border-color: var(--sub-color);
-        }
-
-        .user-badge svg {
-            color: var(--main-color);
-        }
-
-        /* =========================================
-           4. TEST CONFIGURATION PILL BAR
-           ========================================= */
-        #test-config-bar {
-            display: flex;
-            justify-content: center;
-            margin: 1.5rem auto 0;
-            width: 100%;
-        }
-
-        .config-pill {
-            background-color: var(--sub-alt-color);
-            border-radius: 0.6rem;
-            padding: 0.4rem 0.85rem;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.35rem;
-            font-size: 0.8rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-        }
-
-        .config-group {
-            display: flex;
-            align-items: center;
-            gap: 0.2rem;
-        }
-
-        .config-btn {
-            padding: 0.4rem 0.65rem;
-            font-size: 0.8rem;
-            border-radius: 0.4rem;
-        }
-
-        .config-btn.active {
-            color: var(--main-color);
-            font-weight: 600;
-        }
-
-        .config-divider {
-            width: 4px;
-            height: 1.2rem;
-            background-color: var(--bg-color);
-            border-radius: 2px;
-            margin: 0 0.45rem;
-        }
-
-        /* =========================================
-           5. MAIN VIEWS CONTAINER
-           ========================================= */
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-            margin: 1.5rem 0;
-        }
-
-        .view-section {
-            display: none;
-            width: 100%;
-            animation: fadeIn 0.22s ease forwards;
-        }
-
-        .view-section.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* =========================================
-           6. TYPING TEST ARENA
-           ========================================= */
-        .typing-wrapper {
-            width: 100%;
-            max-width: 1050px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .lang-indicator-row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 1rem;
-            gap: 1rem;
-        }
-
-        .lang-selector-btn {
-            font-size: 0.88rem;
-            color: var(--sub-color);
-            padding: 0.35rem 0.75rem;
-            border-radius: 0.4rem;
-        }
-
-        .lang-selector-btn:hover {
-            color: var(--text-color);
-            background-color: var(--sub-alt-color);
-        }
-
-        .caps-warning {
-            display: none;
-            align-items: center;
-            gap: 0.5rem;
-            background-color: var(--main-color);
-            color: var(--bg-color);
-            padding: 0.45rem 0.95rem;
-            border-radius: 0.5rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin: 0 auto 1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-        }
-
-        .caps-warning.visible {
-            display: inline-flex;
-        }
-
-        .live-stats-bar {
-            display: flex;
-            align-items: baseline;
-            gap: 1.75rem;
-            font-size: 1.65rem;
-            font-weight: 500;
-            color: var(--main-color);
-            min-height: 2.3rem;
-            margin-bottom: 0.4rem;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .live-stats-bar.visible {
-            opacity: 1;
-        }
-
-        .live-wpm-box {
-            font-size: 1.15rem;
-            color: var(--sub-color);
-        }
-
-        .live-wpm-box span {
-            color: var(--main-color);
-            font-weight: 600;
-        }
-
-        /* Words Container (3 visible lines) */
-        .words-viewport {
-            position: relative;
-            width: 100%;
-            height: 138px; /* 3 lines * 46px line-height */
-            overflow: hidden;
-            cursor: text;
-        }
-
-        .words-container {
-            display: flex;
-            flex-wrap: wrap;
-            align-content: flex-start;
-            font-size: 1.75rem;
-            line-height: 46px;
-            letter-spacing: 0.02em;
-            position: relative;
-            transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        /* Zen Mode Input */
-        .zen-textarea {
-            width: 100%;
-            min-height: 160px;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text-color);
-            font-family: 'Roboto Mono', monospace;
-            font-size: 1.65rem;
-            line-height: 1.6;
-            resize: none;
-            caret-color: var(--caret-color);
-        }
-
-        .word {
-            margin-right: 0.68em;
-            display: inline-flex;
-            position: relative;
-            border-bottom: 2px solid transparent;
-        }
-
-        .word.error-underline {
-            border-bottom-color: var(--error-color);
-        }
-
-        .letter {
-            color: var(--sub-color);
-            position: relative;
-            transition: color 0.06s ease;
-        }
-
-        .letter.correct {
-            color: var(--text-color);
-        }
-
-        .letter.incorrect {
-            color: var(--error-color);
-        }
-
-        .letter.extra {
-            color: var(--error-extra-color);
-            opacity: 0.9;
-        }
-
-        /* Smooth Animated Caret */
-        #caret {
-            position: absolute;
-            width: 2.5px;
-            height: 2.05rem;
-            background-color: var(--caret-color);
-            border-radius: 2px;
-            top: 6px;
-            left: 0;
-            pointer-events: none;
-            z-index: 10;
-            transition: left 0.08s ease-out, top 0.08s ease-out;
-        }
-
-        #caret.no-smooth {
-            transition: none;
-        }
-
-        #caret.blinking {
-            animation: caretBlink 1s infinite;
-        }
-
-        #caret.block {
-            width: 1.05rem;
-            opacity: 0.45;
-        }
-
-        #caret.underline {
-            width: 1.05rem;
-            height: 3px;
-            top: 38px;
-        }
-
-        @keyframes caretBlink {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
-        }
-
-        /* Out of focus blur overlay */
-        .blur-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(50, 52, 55, 0.45);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.6rem;
-            color: var(--text-color);
-            font-size: 1rem;
-            border-radius: 0.5rem;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-            z-index: 20;
-        }
-
-        .blur-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-            cursor: pointer;
-        }
-
-        #hidden-input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-            width: 1px;
-            height: 1px;
-        }
-
-        .restart-row {
-            display: flex;
-            justify-content: center;
-            margin-top: 2rem;
-            gap: 1rem;
-        }
-
-        .restart-btn {
-            padding: 0.85rem 1.4rem;
-            border-radius: 0.5rem;
-            color: var(--sub-color);
-        }
-
-        .restart-btn:hover, .restart-btn:focus {
-            color: var(--text-color);
-            background-color: var(--sub-alt-color);
-            outline: none;
-        }
-
-        /* =========================================
-           7. TEST RESULTS SCREEN (WPM + CHART)
-           ========================================= */
-        #results-screen {
-            display: none;
-            width: 100%;
-            max-width: 1050px;
-            margin: 0 auto;
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        #results-screen.active {
-            display: flex;
-            flex-direction: column;
-            gap: 1.75rem;
-        }
-
-        .results-top-grid {
-            display: grid;
-            grid-template-columns: 185px 1fr;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .primary-stats {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .stat-hero-group .stat-label {
-            font-size: 1.65rem;
-            color: var(--sub-color);
-            line-height: 1.1;
-        }
-
-        .stat-hero-group .stat-value {
-            font-size: 3.75rem;
-            font-weight: 600;
-            color: var(--main-color);
-            line-height: 1.05;
-        }
-
-        .chart-box {
-            width: 100%;
-            height: 225px;
-            background-color: var(--sub-alt-color);
-            border-radius: 0.75rem;
-            padding: 1rem;
-            position: relative;
-        }
-
-        #wpm-chart {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .results-bottom-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1.25rem;
-            background-color: var(--sub-alt-color);
-            padding: 1.25rem 1.5rem;
-            border-radius: 0.75rem;
-        }
-
-        .sub-stat .label {
-            font-size: 0.85rem;
-            color: var(--sub-color);
-            margin-bottom: 0.25rem;
-        }
-
-        .sub-stat .value {
-            font-size: 1.45rem;
-            font-weight: 600;
-            color: var(--main-color);
-        }
-
-        .sub-stat .value.small-text {
-            font-size: 1.05rem;
-            color: var(--text-color);
-        }
-
-        .result-actions {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1.25rem;
-            margin-top: 0.5rem;
-        }
-
-        .action-pill-btn {
-            padding: 0.75rem 1.35rem;
-            background-color: var(--sub-alt-color);
-            color: var(--text-color);
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .action-pill-btn:hover {
-            background-color: var(--main-color);
-            color: var(--bg-color);
-        }
-
-        .action-pill-btn.primary {
-            background-color: var(--main-color);
-            color: var(--bg-color);
-            font-weight: 600;
-        }
-
-        /* =========================================
-           8. REKORDLAR (LEADERBOARD) SECTION
-           ========================================= */
-        .records-container {
-            width: 100%;
-            max-width: 1050px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            border-bottom: 2px solid var(--sub-alt-color);
-            padding-bottom: 1rem;
-        }
-
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.65rem;
-            color: var(--text-color);
-            font-family: 'Lexend Deca', sans-serif;
-        }
-
-        .section-title svg {
-            width: 1.75rem;
-            height: 1.75rem;
-            color: var(--main-color);
-        }
-
-        .records-filters {
-            display: flex;
-            gap: 0.5rem;
-            background-color: var(--sub-alt-color);
-            padding: 0.35rem;
-            border-radius: 0.5rem;
-        }
-
-        .filter-tab {
-            padding: 0.45rem 0.9rem;
-            font-size: 0.85rem;
-            border-radius: 0.4rem;
-        }
-
-        .filter-tab.active {
-            background-color: var(--main-color);
-            color: var(--bg-color);
-            font-weight: 600;
-        }
-
-        .records-table-wrap {
-            width: 100%;
-            overflow-x: auto;
-            background-color: var(--sub-alt-color);
-            border-radius: 0.75rem;
-            padding: 0.5rem;
-        }
-
-        table.records-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-
-        table.records-table th {
-            color: var(--sub-color);
-            font-weight: 500;
-            padding: 0.85rem 1rem;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        table.records-table td {
-            padding: 0.85rem 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-            color: var(--text-color);
-        }
-
-        table.records-table tr:nth-child(even) td {
-            background-color: rgba(0, 0, 0, 0.12);
-        }
-
-        table.records-table tr.user-record-row td {
-            border-left: 3px solid var(--main-color);
-            background-color: rgba(226, 183, 20, 0.08);
-        }
-
-        .rank-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 0.4rem;
-            font-weight: 700;
-        }
-
-        .rank-1 { background: rgba(226, 183, 20, 0.2); color: #e2b714; }
-        .rank-2 { background: rgba(192, 192, 192, 0.2); color: #d1d0c5; }
-        .rank-3 { background: rgba(205, 127, 50, 0.2); color: #cd7f32; }
-
-        .wpm-highlight {
-            color: var(--main-color);
-            font-weight: 700;
-            font-size: 1.05rem;
-        }
-
-        /* =========================================
-           9. SETTINGS & ABOUT SECTIONS
-           ========================================= */
-        .settings-container, .about-container {
-            width: 100%;
-            max-width: 1050px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .setting-block {
-            display: flex;
-            flex-direction: column;
-            gap: 0.85rem;
-        }
-
-        .setting-block h3 {
-            color: var(--main-color);
-            font-size: 1.15rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .setting-desc {
-            color: var(--sub-color);
-            font-size: 0.85rem;
-        }
-
-        .theme-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
-            gap: 0.75rem;
-        }
-
-        .theme-card {
-            padding: 0.85rem 1rem;
-            border-radius: 0.55rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.88rem;
-            font-weight: 600;
-            border: 2px solid transparent;
-            transition: transform 0.15s ease, border-color 0.15s ease;
-        }
-
-        .theme-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .theme-card.active {
-            border-color: var(--main-color);
-        }
-
-        .theme-dots {
-            display: flex;
-            gap: 4px;
-        }
-
-        .theme-dots span {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .options-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-
-        .opt-pill {
-            background-color: var(--sub-alt-color);
-            color: var(--text-color);
-            padding: 0.6rem 1.15rem;
-            border-radius: 0.5rem;
-            font-size: 0.88rem;
-        }
-
-        .opt-pill.active {
-            background-color: var(--main-color);
-            color: var(--bg-color);
-            font-weight: 600;
-        }
-
-        /* About Stats */
-        .about-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .about-stat-card {
-            background-color: var(--sub-alt-color);
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .about-stat-card .big-num {
-            font-size: 2.25rem;
-            font-weight: 700;
-            color: var(--main-color);
-        }
-
-        .about-text {
-            color: var(--text-color);
-            line-height: 1.75;
-            font-size: 0.95rem;
-        }
-
-        /* =========================================
-           10. MODALS (CUSTOM TEXT, LANGUAGE, NICKNAME)
-           ========================================= */
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.68);
-            backdrop-filter: blur(3px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 1rem;
-        }
-
-        .modal-backdrop.active {
-            display: flex;
-        }
-
-        .modal-box {
-            background-color: var(--bg-color);
-            border: 2px solid var(--sub-alt-color);
-            border-radius: 0.85rem;
-            width: 100%;
-            max-width: 520px;
-            padding: 1.75rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.15rem;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);
-        }
-
-        .modal-box h3 {
-            color: var(--text-color);
-            font-size: 1.25rem;
-        }
-
-        .modal-input, .modal-textarea {
-            width: 100%;
-            background-color: var(--sub-alt-color);
-            border: 1px solid var(--sub-color);
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            color: var(--text-color);
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        .modal-input:focus, .modal-textarea:focus {
-            border-color: var(--main-color);
-        }
-
-        .modal-textarea {
-            min-height: 130px;
-            resize: vertical;
-        }
-
-        .lang-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .lang-option {
-            padding: 0.75rem 1rem;
-            background-color: var(--sub-alt-color);
-            border-radius: 0.5rem;
-            justify-content: space-between;
-            color: var(--text-color);
-            font-size: 0.95rem;
-        }
-
-        .lang-option.active {
-            background-color: var(--main-color);
-            color: var(--bg-color);
-            font-weight: 600;
-        }
-
-        /* Toast Notification */
-        #toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background-color: var(--sub-alt-color);
-            border-left: 4px solid var(--main-color);
-            color: var(--text-color);
-            padding: 0.85rem 1.25rem;
-            border-radius: 0.5rem;
-            font-size: 0.88rem;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-            transform: translateY(120%);
-            opacity: 0;
-            transition: all 0.25s ease;
-            z-index: 200;
-        }
-
-        #toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        /* =========================================
-           11. FOOTER & KEYBINDS
-           ========================================= */
-        footer {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            padding-top: 1.5rem;
-            font-size: 0.78rem;
-            color: var(--sub-color);
-        }
-
-        .keybinds-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.25rem;
-        }
-
-        kbd {
-            background-color: var(--sub-alt-color);
-            color: var(--text-color);
-            padding: 0.15rem 0.45rem;
-            border-radius: 0.3rem;
-            font-family: inherit;
-            font-size: 0.75rem;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .footer-group {
-            display: flex;
-            gap: 1.25rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-group span {
-            cursor: pointer;
-            transition: color 0.15s;
-        }
-
-        .footer-group span:hover {
-            color: var(--text-color);
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .container { padding: 1.25rem; }
-            .results-top-grid { grid-template-columns: 1fr; }
-            .primary-stats { flex-direction: row; justify-content: space-around; }
-            .words-container { font-size: 1.4rem; line-height: 42px; }
-            .words-viewport { height: 126px; }
-            #caret { height: 1.65rem; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON RUSH 3D — Racing</title>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  overflow:hidden;
+  background:#83c9ed;
+  font-family:Arial,sans-serif;
+  color:white;
+}
+canvas{display:block}
+#game{position:fixed;inset:0}
+.hud{
+  position:fixed;
+  left:25px;top:25px;
+  width:220px;
+  padding:16px;
+  border-radius:18px;
+  background:rgba(15,25,37,.88);
+  border:1px solid #ffffff30;
+  backdrop-filter:blur(12px);
+  z-index:5;
+  box-shadow:0 10px 35px #0004;
+}
+.hud-line{
+  display:flex;
+  justify-content:space-between;
+  padding:9px 0;
+  border-bottom:1px solid #ffffff20;
+  font-weight:bold;
+  font-size:13px;
+}
+.hud-line:last-child{border:0}
+.hud-line span:first-child{color:#a5b2c1}
+.cyan{color:#12d9f0}
+.green{color:#36d9a0}
+.yellow{color:#ffce48}
+.orange{color:#ff9a30}
+.stats{
+  position:fixed;
+  left:25px;top:245px;
+  background:#172331e8;
+  border-radius:17px;
+  width:220px;
+  padding:15px;
+  z-index:5;
+  border:1px solid #ffffff30;
+}
+.stats-row{display:flex;justify-content:space-between}
+.stats small{color:#a6b3c1;font-weight:bold}
+.stats strong{display:block;font-size:23px;margin-top:7px}
+.nitro{
+  margin-top:13px;
+  background:#172331e8;
+  padding:14px;
+  border-radius:14px;
+}
+.nitro-head{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:9px;
+}
+.nitro-track{
+  height:10px;
+  background:#394250;
+  border-radius:20px;
+  overflow:hidden;
+}
+#nitroBar{
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,#ff9a00,#ff315e);
+  border-radius:20px;
+}
+.top-buttons{
+  position:fixed;
+  right:25px;top:25px;
+  display:flex;gap:10px;
+  z-index:8;
+}
+.top-buttons button{
+  border:1px solid #ffffff30;
+  background:#151d28e8;
+  color:white;
+  border-radius:14px;
+  padding:14px 16px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.top-buttons button:hover{background:#00abc5}
+.overlay{
+  position:fixed;inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#07101b9c;
+  z-index:20;
+  backdrop-filter:blur(7px);
+}
+.panel{
+  width:min(90%,470px);
+  padding:35px;
+  background:#101d2b;
+  border:1px solid #ffffff30;
+  border-radius:25px;
+  text-align:center;
+  box-shadow:0 20px 70px #0007;
+}
+.panel h1{
+  font-size:39px;
+  margin:5px 0;
+  font-weight:900;
+}
+.panel h1 span{color:#16d7e9}
+.panel p{color:#a8b9c9;line-height:1.6}
+.main-btn{
+  border:0;
+  background:linear-gradient(100deg,#00bed4,#27e2c0);
+  color:#06131c;
+  padding:16px 28px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+  margin-top:15px;
+}
+.main-btn:hover{transform:scale(1.04)}
+.hidden{display:none!important}
+#countdown{
+  position:fixed;
+  top:40%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:10;
+  text-align:center;
+  pointer-events:none;
+}
+#countNumber{
+  font-size:85px;
+  font-weight:1000;
+  color:#36dcaa;
+  text-shadow:0 4px 35px #00ffb477;
+}
+.lights{
+  display:flex;
+  gap:12px;
+  padding:17px 23px;
+  background:#182332e8;
+  border-radius:20px;
+  margin-bottom:15px;
+}
+.light{
+  width:29px;height:29px;
+  background:#43515d;
+  border-radius:50%;
+}
+.light.active{
+  background:#30d9a0;
+  box-shadow:0 0 25px #30d9a0;
+}
+#countText{font-weight:1000;font-size:65px;color:#30d9a0}
+#bottomControls{
+  position:fixed;
+  bottom:25px;left:25px;right:25px;
+  display:flex;justify-content:space-between;
+  pointer-events:none;
+  z-index:8;
+}
+.touch-group{display:flex;gap:12px;pointer-events:auto}
+.touch-btn{
+  width:65px;height:65px;
+  border:1px solid #ffffff44;
+  background:#152436bb;
+  color:white;
+  border-radius:18px;
+  font-size:25px;
+  touch-action:none;
+}
+.touch-btn:active{background:#00afc6}
+#finishInfo{font-size:24px;color:#39dbaa;font-weight:900}
+@media(max-width:600px){
+  .hud{left:10px;top:10px;width:175px;padding:10px}
+  .hud-line{font-size:11px;padding:6px 0}
+  .stats{left:10px;top:205px;width:175px;padding:10px}
+  .top-buttons{right:10px;top:10px;gap:5px}
+  .top-buttons button{padding:10px;font-size:11px}
+  .panel{padding:22px}
+  .panel h1{font-size:30px}
+  #bottomControls{bottom:12px;left:10px;right:10px}
+  .touch-btn{width:55px;height:55px}
+}
+</style>
 </head>
+
 <body>
 
-<div class="container">
-    <!-- ==================== HEADER ==================== -->
-    <header>
-        <div class="header-left">
-            <div class="logo" onclick="switchView('test')">
-                <svg class="logo-icon" viewBox="0 0 24 24">
-                    <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/>
-                </svg>
-                <div class="logo-text-wrap">
-                    <span class="logo-sub">monkey see</span>
-                    <span class="logo-title">monkeytype</span>
-                </div>
-            </div>
+<div id="game"></div>
 
-            <nav class="nav-links">
-                <button class="nav-btn active" id="nav-test" onclick="switchView('test')" title="Test">
-                    <svg viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
-                </button>
-                <button class="nav-btn" id="nav-records" onclick="switchView('records')" title="Rekordlar">
-                    <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
-                    <span>rekordlar</span>
-                </button>
-                <button class="nav-btn" id="nav-about" onclick="switchView('about')" title="Haqida">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                </button>
-                <button class="nav-btn" id="nav-settings" onclick="switchView('settings')" title="Sozlamalar">
-                    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                </button>
-            </nav>
-        </div>
-
-        <div class="user-controls">
-            <button class="nav-btn" onclick="switchView('settings')" title="Mavzuni almashtirish">
-                <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-            </button>
-            <div class="user-badge" onclick="openNicknameModal()" title="Ismni o'zgartirish">
-                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                <span id="header-username">mehmon_uz</span>
-            </div>
-        </div>
-    </header>
-
-    <!-- ==================== CONFIG PILL BAR ==================== -->
-    <div id="test-config-bar">
-        <div class="config-pill">
-            <div class="config-group" id="modifiers-group">
-                <button class="config-btn" id="toggle-punctuation" onclick="toggleModifier('punctuation')">@ punctuation</button>
-                <button class="config-btn" id="toggle-numbers" onclick="toggleModifier('numbers')"># numbers</button>
-            </div>
-            <div class="config-divider" id="divider-1"></div>
-            <div class="config-group" id="modes-group">
-                <button class="config-btn active" data-mode="time" onclick="setMode('time')">time</button>
-                <button class="config-btn" data-mode="words" onclick="setMode('words')">words</button>
-                <button class="config-btn" data-mode="quote" onclick="setMode('quote')">quote</button>
-                <button class="config-btn" data-mode="zen" onclick="setMode('zen')">zen</button>
-                <button class="config-btn" data-mode="custom" onclick="setMode('custom')">custom</button>
-            </div>
-            <div class="config-divider" id="divider-2"></div>
-            <div class="config-group" id="suboptions-group">
-                <!-- Dinamik ravishda JS orqali to'ldiriladi -->
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== MAIN CONTENT ==================== -->
-    <main>
-        <!-- 1. TYPING TEST VIEW -->
-        <section id="view-test" class="view-section active">
-            <!-- Typing Area -->
-            <div id="typing-arena" class="typing-wrapper">
-                <div class="lang-indicator-row">
-                    <button class="lang-selector-btn" onclick="openLangModal()">
-                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95a15.65 15.65 0 00-1.38-3.56A8.03 8.03 0 0118.92 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.987 7.987 0 015.08 16zm2.95-8H5.08a7.987 7.987 0 014.33-3.56A15.65 15.65 0 008.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
-                        <span id="current-lang-label">o'zbekcha</span>
-                    </button>
-                </div>
-
-                <div class="caps-warning" id="caps-warning">
-                    <svg viewBox="0 0 24 24"><path d="M12 8.41L16.59 13 18 11.59l-6-6-6 6L7.41 13 12 8.41zM6 18h12v-2H6v2z"/></svg>
-                    <span>Caps Lock yoqilgan</span>
-                </div>
-
-                <div class="live-stats-bar" id="live-stats-bar">
-                    <div id="live-counter">30</div>
-                    <div class="live-wpm-box">wpm: <span id="live-wpm">0</span></div>
-                </div>
-
-                <div class="words-viewport" id="words-viewport" onclick="focusInput()">
-                    <div id="caret" class="blinking"></div>
-                    <div class="words-container" id="words-container"></div>
-                    <textarea id="zen-input" class="zen-textarea" style="display:none;" placeholder="Xohlagan matningizni yozing... Tugatish uchun Shift + Enter bosing"></textarea>
-                    <div class="blur-overlay" id="blur-overlay">
-                        <svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
-                        <span>Davom etish uchun bosing yoki istalgan tugmani tering</span>
-                    </div>
-                </div>
-
-                <input type="text" id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-
-                <div class="restart-row">
-                    <button class="restart-btn" id="restart-btn" onclick="resetTest(false)" title="Testni yangilash (Tab + Enter)">
-                        <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Detailed Results Screen -->
-            <div id="results-screen">
-                <div class="results-top-grid">
-                    <div class="primary-stats">
-                        <div class="stat-hero-group">
-                            <div class="stat-label">wpm</div>
-                            <div class="stat-value" id="res-wpm">0</div>
-                        </div>
-                        <div class="stat-hero-group">
-                            <div class="stat-label">acc</div>
-                            <div class="stat-value" id="res-acc">0%</div>
-                        </div>
-                    </div>
-                    <div class="chart-box">
-                        <canvas id="wpm-chart"></canvas>
-                    </div>
-                </div>
-
-                <div class="results-bottom-grid">
-                    <div class="sub-stat">
-                        <div class="label">test turi</div>
-                        <div class="value small-text" id="res-type">time 30</div>
-                    </div>
-                    <div class="sub-stat">
-                        <div class="label">raw</div>
-                        <div class="value" id="res-raw">0</div>
-                    </div>
-                    <div class="sub-stat">
-                        <div class="label">belgilar</div>
-                        <div class="value" id="res-chars" title="to'g'ri / xato / ortiqcha / qolib ketgan">0/0/0/0</div>
-                    </div>
-                    <div class="sub-stat">
-                        <div class="label">barqarorlik</div>
-                        <div class="value" id="res-consistency">0%</div>
-                    </div>
-                    <div class="sub-stat">
-                        <div class="label">vaqt</div>
-                        <div class="value" id="res-time">30s</div>
-                    </div>
-                </div>
-
-                <div class="result-actions">
-                    <button class="action-pill-btn primary" onclick="resetTest(false)" title="Keyingi test">
-                        <svg viewBox="0 0 24 24"><path d="M5 13h11.17l-4.88 4.88c-.39.39-.39 1.03 0 1.42.39.39 1.02.39 1.41 0l6.59-6.59a.996.996 0 000-1.41l-6.58-6.6a.996.996 0 10-1.41 1.41L16.17 11H5c-.55 0-1 .45-1 1s.45 1 1 1z"/></svg>
-                        <span>Keyingi test</span>
-                    </button>
-                    <button class="action-pill-btn" onclick="resetTest(true)" title="Shu matnni qayta terish">
-                        <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-                        <span>Qayta urinish</span>
-                    </button>
-                    <button class="action-pill-btn" onclick="switchView('records')">
-                        <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
-                        <span>Rekordlarni ko'rish</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2. REKORDLAR (LEADERBOARD) VIEW -->
-        <section id="view-records" class="view-section">
-            <div class="records-container">
-                <div class="section-header">
-                    <div class="section-title">
-                        <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
-                        <span>Rekordlar Jadvali</span>
-                    </div>
-                    <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
-                        <div class="records-filters">
-                            <button class="filter-tab active" onclick="filterRecords('all', this)">Barchasi</button>
-                            <button class="filter-tab" onclick="filterRecords('time 15', this)">15 soniya</button>
-                            <button class="filter-tab" onclick="filterRecords('time 30', this)">30 soniya</button>
-                            <button class="filter-tab" onclick="filterRecords('time 60', this)">60 soniya</button>
-                        </div>
-                        <button class="action-pill-btn" onclick="openNicknameModal()" style="padding: 0.45rem 0.85rem; font-size:0.8rem;">
-                            Ismni o'zgartirish
-                        </button>
-                    </div>
-                </div>
-
-                <div class="records-table-wrap">
-                    <table class="records-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Foydalanuvchi</th>
-                                <th>WPM</th>
-                                <th>Aniqlik</th>
-                                <th>Raw</th>
-                                <th>Barqarorlik</th>
-                                <th>Rejim</th>
-                                <th>Sana</th>
-                            </tr>
-                        </thead>
-                        <tbody id="records-tbody">
-                            <!-- JS orqali dinamik to'ldiriladi -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. SETTINGS VIEW -->
-        <section id="view-settings" class="view-section">
-            <div class="settings-container">
-                <div class="section-header">
-                    <div class="section-title">
-                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                        <span>Sozlamalar</span>
-                    </div>
-                </div>
-
-                <!-- Themes -->
-                <div class="setting-block">
-                    <h3>Mavzu (Theme)</h3>
-                    <p class="setting-desc">O'zingizga yoqqan ranglar palitrasini tanlang.</p>
-                    <div class="theme-grid" id="theme-grid"></div>
-                </div>
-
-                <!-- Caret Style -->
-                <div class="setting-block">
-                    <h3>Kursor ko'rinishi (Caret style)</h3>
-                    <p class="setting-desc">Matn terish vaqtidagi kursor shaklini o'zgartiring.</p>
-                    <div class="options-row" id="caret-style-opts">
-                        <button class="opt-pill active" data-caret="line" onclick="setCaretStyle('line')">| chiziq (line)</button>
-                        <button class="opt-pill" data-caret="block" onclick="setCaretStyle('block')">█ blok (block)</button>
-                        <button class="opt-pill" data-caret="underline" onclick="setCaretStyle('underline')">_ ostki chiziq (underline)</button>
-                    </div>
-                </div>
-
-                <!-- Smooth Caret & Sound -->
-                <div class="setting-block">
-                    <h3>Qo'shimcha funksiyalar</h3>
-                    <div class="options-row">
-                        <button class="opt-pill active" id="btn-smooth-caret" onclick="toggleSmoothCaret()">Silliq kursor: Yoqilgan</button>
-                        <button class="opt-pill" id="btn-sound-click" onclick="toggleSound()">Mexanik klaviatura ovozi: O'chirilgan</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. ABOUT VIEW -->
-        <section id="view-about" class="view-section">
-            <div class="about-container">
-                <div class="section-header">
-                    <div class="section-title">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                        <span>Monkeytype Haqida</span>
-                    </div>
-                </div>
-
-                <p class="about-text">
-                    <strong>Monkeytype</strong> — bu minimalistik va yuqori darajada moslashtiriladigan tez yozish (typing) trenajyori. U foydalanuvchiga ortiqcha chalg'ituvchi elementlarsiz o'zining yozish tezligi (WPM), aniqligi (Accuracy) va barqarorligini (Consistency) oshirishga yordam beradi.
-                </p>
-
-                <div class="about-stats-grid">
-                    <div class="about-stat-card">
-                        <span class="setting-desc">jami tugallangan testlar</span>
-                        <span class="big-num" id="about-total-tests">0</span>
-                    </div>
-                    <div class="about-stat-card">
-                        <span class="setting-desc">eng yuqori tezlik (WPM)</span>
-                        <span class="big-num" id="about-best-wpm">0</span>
-                    </div>
-                    <div class="about-stat-card">
-                        <span class="setting-desc">o'rtacha aniqlik</span>
-                        <span class="big-num" id="about-avg-acc">0%</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- ==================== FOOTER ==================== -->
-    <footer>
-        <div class="keybinds-row">
-            <span><kbd>tab</kbd> + <kbd>enter</kbd> - testni qayta boshlash</span>
-            <span><kbd>esc</kbd> - tezkor qayta yuklash</span>
-        </div>
-        <div class="footer-links">
-            <div class="footer-group">
-                <span onclick="switchView('test')">test</span>
-                <span onclick="switchView('records')">rekordlar</span>
-                <span onclick="switchView('settings')">sozlamalar</span>
-                <span onclick="switchView('about')">haqida</span>
-            </div>
-            <div class="footer-group">
-                <span onclick="switchView('settings')" id="footer-theme-name">serika_dark</span>
-                <span>v2.5.0</span>
-            </div>
-        </div>
-    </footer>
+<!-- HUD -->
+<div class="hud">
+  <div class="hud-line">
+    <span>O‘RIN</span>
+    <span class="cyan" id="position">6/6</span>
+  </div>
+  <div class="hud-line">
+    <span>MASOFA</span>
+    <span class="green" id="distance">0/3.6 km</span>
+  </div>
+  <div class="hud-line">
+    <span>VAQT</span>
+    <span class="yellow" id="timer">00:00.00</span>
+  </div>
 </div>
 
-<!-- ==================== MODALS ==================== -->
-<!-- Language Modal -->
-<div class="modal-backdrop" id="lang-modal" onclick="closeModalOnBackdrop(event, 'lang-modal')">
-    <div class="modal-box">
-        <h3>Tilni tanlang (Language)</h3>
-        <div class="lang-list" id="lang-list">
-            <button class="lang-option active" data-lang="uzbek" onclick="setLanguage('uzbek')">
-                <span>O'zbekcha</span>
-                <span>uz</span>
-            </button>
-            <button class="lang-option" data-lang="english" onclick="setLanguage('english')">
-                <span>English</span>
-                <span>en</span>
-            </button>
-            <button class="lang-option" data-lang="russian" onclick="setLanguage('russian')">
-                <span>Русский</span>
-                <span>ru</span>
-            </button>
-        </div>
+<div class="stats">
+  <div class="stats-row">
+    <div>
+      <small>BALL</small>
+      <strong class="green" id="score">0</strong>
     </div>
+    <div>
+      <small>TEZLIK</small>
+      <strong class="cyan"><span id="speed">0</span> <small>km/s</small></strong>
+    </div>
+  </div>
+
+  <div class="nitro">
+    <div class="nitro-head">
+      <span class="orange">🔥 NITRO (SPACE)</span>
+      <span id="nitroPercent">100%</span>
+    </div>
+    <div class="nitro-track">
+      <div id="nitroBar"></div>
+    </div>
+  </div>
 </div>
 
-<!-- Custom Text Modal -->
-<div class="modal-backdrop" id="custom-modal" onclick="closeModalOnBackdrop(event, 'custom-modal')">
-    <div class="modal-box">
-        <h3>Maxsus matn kiriting (Custom Text)</h3>
-        <textarea class="modal-textarea" id="custom-text-input" placeholder="Test uchun o'z matningizni shu yerga yozing yoki joylashtiring...">Bugun havo juda ajoyib, biz yangi loyihalar ustida ishlayapmiz va klaviaturada tez yozishni mashq qilyapmiz.</textarea>
-        <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
-            <button class="action-pill-btn" onclick="closeModal('custom-modal')">Bekor qilish</button>
-            <button class="action-pill-btn primary" onclick="applyCustomText()">Tasdiqlash</button>
-        </div>
-    </div>
+<!-- Buttons -->
+<div class="top-buttons">
+  <button id="cameraBtn">📹 Orqadan</button>
+  <button id="soundBtn">🔊</button>
+  <button id="pauseBtn">Ⅱ</button>
 </div>
 
-<!-- Nickname Modal -->
-<div class="modal-backdrop" id="nickname-modal" onclick="closeModalOnBackdrop(event, 'nickname-modal')">
-    <div class="modal-box">
-        <h3>Foydalanuvchi nomini kiriting</h3>
-        <p class="setting-desc">Yangi natijalaringiz shu ism ostida Rekordlar jadvaliga yoziladi.</p>
-        <input type="text" class="modal-input" id="nickname-input" maxlength="20" placeholder="Ismingiz yoki taxallusingiz...">
-        <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
-            <button class="action-pill-btn" onclick="closeModal('nickname-modal')">Bekor qilish</button>
-            <button class="action-pill-btn primary" onclick="saveNickname()">Saqlash</button>
-        </div>
-    </div>
+<!-- Touch controls -->
+<div id="bottomControls">
+  <div class="touch-group">
+    <button class="touch-btn" data-key="ArrowLeft">◀</button>
+    <button class="touch-btn" data-key="ArrowRight">▶</button>
+  </div>
+  <div class="touch-group">
+    <button class="touch-btn" data-key="Space">🔥</button>
+  </div>
 </div>
 
-<!-- Toast -->
-<div id="toast">Xabar</div>
+<!-- Start screen -->
+<div class="overlay" id="startScreen">
+  <div class="panel">
+    <h1>NEON <span>RUSH 3D</span></h1>
+    <p>Haqiqiy 3D avtomobil poygasi!</p>
+    <p>5 ta bot-raqib bilan bellashing.<br>
+    Nitro ishlating va marraga birinchi yetib boring.</p>
+    <button class="main-btn" id="startBtn">🏁 POYGANI BOSHLASH</button>
+  </div>
+</div>
 
-<script>
-    /* =================================================================
-       1. DICTIONARIES & QUOTES (UZBEK, ENGLISH, RUSSIAN)
-       ================================================================= */
-    const WORD_BANKS = {
-        uzbek: [
-            "va", "bu", "uchun", "bilan", "ham", "bir", "bo'lib", "ekan", "kerak", "yaxshi",
-            "katta", "kichik", "yangi", "eski", "odam", "vaqt", "kun", "yil", "ish", "so'z",
-            "kitob", "maktab", "universitet", "dastur", "kompyuter", "klaviatura", "tezlik", "aniqlik",
-            "dunyo", "hayot", "ilm", "bilim", "maqsad", "harakat", "muvaffaqiyat", "kelajak", "bugun",
-            "ertaga", "kecha", "do'st", "oila", "vatan", "shahar", "ko'cha", "uy", "suv", "non",
-            "quyosh", "oy", "yulduz", "osmon", "yer", "tog'", "daryo", "daraxt", "gul", "bahor",
-            "yoz", "kuz", "qish", "shamol", "yomg'ir", "qor", "issiq", "sovuq", "tong", "kech",
-            "fikr", "g'oya", "reja", "natija", "tajriba", "mahorat", "sabr", "ishonch", "umid",
-            "baxt", "quvonch", "mehr", "hurmat", "adolat", "haqiqat", "erkinlik", "tinchlik",
-            "texnologiya", "internet", "tarmoq", "axborot", "tizim", "loyiha", "vazifa", "yechim",
-            "o'qish", "yozish", "o'rganish", "yaratish", "rivojlanish", "o'zgarish", "boshlash"
-        ],
-        english: [
-            "the", "be", "to", "of", "and", "a", "in", "that", "have", "it",
-            "for", "not", "on", "with", "he", "as", "you", "do", "at", "this",
-            "but", "his", "by", "from", "they", "we", "say", "her", "she", "or",
-            "an", "will", "my", "one", "all", "would", "there", "their", "what",
-            "so", "up", "out", "if", "about", "who", "get", "which", "go", "me",
-            "when", "make", "can", "like", "time", "no", "just", "him", "know",
-            "take", "people", "into", "year", "your", "good", "some", "could",
-            "them", "see", "other", "than", "then", "now", "look", "only", "come",
-            "its", "over", "think", "also", "back", "after", "use", "two", "how",
-            "our", "work", "first", "well", "way", "even", "new", "want", "because",
-            "any", "these", "give", "day", "most", "us", "system", "program", "world"
-        ],
-        russian: [
-            "и", "в", "не", "на", "я", "быть", "он", "с", "что", "а",
-            "по", "это", "она", "к", "но", "они", "мы", "как", "из", "у",
-            "который", "то", "за", "свой", "весь", "год", "от", "так", "о", "для",
-            "ты", "же", "все", "тот", "мочь", "вы", "человек", "такой", "его", "сказать",
-            "только", "или", "еще", "бы", "себя", "один", "уже", "до", "время", "если",
-            "сам", "когда", "другой", "вот", "говорить", "наш", "мой", "знать", "стать",
-            "при", "чтобы", "дело", "жизнь", "кто", "первый", "очень", "два", "день",
-            "рука", "работа", "слово", "место", "лицо", "друг", "глаз", "вопрос", "дом",
-            "сторона", "страна", "мир", "случай", "голова", "ребенок", "сила", "конец",
-            "вид", "система", "часть", "город", "отношение", "женщина", "деньги", "земля"
-        ]
-    };
+<!-- Countdown -->
+<div id="countdown" class="hidden">
+  <div class="lights">
+    <div class="light"></div>
+    <div class="light"></div>
+    <div class="light"></div>
+  </div>
+  <div id="countNumber">3</div>
+</div>
 
-    const QUOTES = {
-        uzbek: [
-            { text: "Bilim — kuchdir, uni egallash esa har bir insonning eng oliy burchidir.", len: "short" },
-            { text: "Muvaffaqiyatga erishishning yagona yo'li — qilayotgan ishingizni chin dildan sevishdir.", len: "short" },
-            { text: "Har bir buyuk sayohat bitta kichik qadamdan boshlanadi. Muhimi to'xtab qolmaslik va doimo oldinga intilishdir.", len: "medium" },
-            { text: "Vaqtingiz cheklangan, shuning uchun uni birovning hayotini yashash bilan behuda sarflamang. O'z ichki ovozingizga quloq soling va o'z yo'lingizdan boring.", len: "long" }
-        ],
-        english: [
-            { text: "The only way to do great work is to love what you do.", len: "short" },
-            { text: "Simplicity is about subtracting the obvious and adding the meaningful.", len: "short" },
-            { text: "Success is not final, failure is not fatal: it is the courage to continue that counts in the end.", len: "medium" },
-            { text: "Your time is limited, so do not waste it living someone else's life. Have the courage to follow your heart and intuition.", len: "long" }
-        ],
-        russian: [
-            { text: "Единственный способ делать великие дела — любить то, что вы делаете.", len: "short" },
-            { text: "Успех — это способность идти от поражения к поражению, не теряя энтузиазма.", len: "medium" },
-            { text: "Ваше время ограничено, не тратьте его, живя чужой жизнью. Не позволяйте шуму чужих мнений перебить ваш внутренний голос.", len: "long" }
-        ]
-    };
+<!-- Pause -->
+<div class="overlay hidden" id="pauseScreen">
+  <div class="panel">
+    <h1>PAUZA</h1>
+    <p>O‘yin vaqtincha to‘xtatildi.</p>
+    <button class="main-btn" id="continueBtn">▶ DAVOM ETISH</button>
+  </div>
+</div>
 
-    const THEMES = [
-        { id: "serika_dark", name: "serika dark", bg: "#323437", main: "#e2b714", text: "#d1d0c5" },
-        { id: "dracula", name: "dracula", bg: "#282a36", main: "#bd93f9", text: "#f8f8f2" },
-        { id: "nord", name: "nord", bg: "#2e3440", main: "#88c0d0", text: "#eceff4" },
-        { id: "botanical", name: "botanical", bg: "#7b9c98", main: "#eaf1f3", text: "#eaf1f3" },
-        { id: "matrix", name: "matrix", bg: "#000000", main: "#15ff00", text: "#d1ffcd" },
-        { id: "light", name: "light", bg: "#e1e1e3", main: "#d69e00", text: "#1c1c1e" }
-    ];
+<!-- Finish -->
+<div class="overlay hidden" id="finishScreen">
+  <div class="panel">
+    <h1 id="finishTitle">🏆 FINISH!</h1>
+    <p id="finishInfo"></p>
+    <p id="finalScore"></p>
+    <button class="main-btn" id="againBtn">🔄 QAYTA O‘YNASH</button>
+    <h3>TOP 10 REKORD</h3>
+    <div id="leaderboard"></div>
+  </div>
+</div>
 
-    /* =================================================================
-       2. APPLICATION STATE
-       ================================================================= */
-    const state = {
-        mode: "time",          // time | words | quote | zen | custom
-        timeLimit: 30,         // 15 | 30 | 60 | 120
-        wordLimit: 25,         // 10 | 25 | 50 | 100
-        quoteLength: "all",    // all | short | medium | long
-        punctuation: false,
-        numbers: false,
-        language: "uzbek",
-        customText: "Bugun havo juda ajoyib, biz yangi loyihalar ustida ishlayapmiz va klaviaturada tez yozishni mashq qilyapmiz.",
+<script type="module">
+import * as THREE from 'three';
 
-        // Typing session state
-        words: [],
-        currentWordIdx: 0,
-        currentCharIdx: 0,
-        isRunning: false,
-        isFinished: false,
-        startTime: null,
-        timerInterval: null,
-        timeElapsed: 0,
-        timeRemaining: 30,
+/* =========================
+   1. ASOSIY SOZLAMALAR
+========================= */
 
-        // Metrics tracking
-        wpmHistory: [],
-        rawHistory: [],
-        errorsPerSecond: [],
-        currentSecondErrors: 0,
-        totalKeystrokes: 0,
-        correctKeystrokes: 0,
-        incorrectKeystrokes: 0,
+const game=document.getElementById('game');
 
-        // Settings & User
-        username: localStorage.getItem("mt_username") || "mehmon_uz",
-        theme: localStorage.getItem("mt_theme") || "serika_dark",
-        caretStyle: localStorage.getItem("mt_caret") || "line",
-        smoothCaret: localStorage.getItem("mt_smooth") !== "false",
-        soundEnabled: localStorage.getItem("mt_sound") === "true"
-    };
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x9bd6f5);
+scene.fog=new THREE.Fog(0x9bd6f5,100,450);
 
-    /* =================================================================
-       3. INITIALIZATION & LOCAL STORAGE RECORDS
-       ================================================================= */
-    const DEFAULT_RECORDS = [
-        { user: "rocket_uz", wpm: 138, acc: 99, raw: 141, consistency: 94, mode: "time 15", date: "2026-11-10", isUser: false },
-        { user: "azamat_dev", wpm: 124, acc: 98, raw: 128, consistency: 91, mode: "time 30", date: "2026-11-11", isUser: false },
-        { user: "shaxzod_pro", wpm: 116, acc: 97, raw: 120, consistency: 89, mode: "time 60", date: "2026-11-09", isUser: false },
-        { user: "nilufar_type", wpm: 109, acc: 99, raw: 111, consistency: 93, mode: "time 15", date: "2026-11-11", isUser: false },
-        { user: "cyber_tashkent", wpm: 98, acc: 96, raw: 103, consistency: 86, mode: "time 30", date: "2026-11-08", isUser: false },
-        { user: "samarkand_coder", wpm: 92, acc: 95, raw: 97, consistency: 84, mode: "time 60", date: "2026-11-07", isUser: false }
-    ];
+const camera=new THREE.PerspectiveCamera(
+  65,window.innerWidth/window.innerHeight,.1,2500
+);
 
-    function getRecords() {
-        const stored = localStorage.getItem("mt_records_v1");
-        if (!stored) {
-            localStorage.setItem("mt_records_v1", JSON.stringify(DEFAULT_RECORDS));
-            return DEFAULT_RECORDS;
-        }
-        return JSON.parse(stored);
+const renderer=new THREE.WebGLRenderer({
+  antialias:true
+});
+
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+game.appendChild(renderer.domElement);
+
+/* Yorug‘lik */
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x627b49,2));
+
+const sun=new THREE.DirectionalLight(0xffffff,2.2);
+sun.position.set(-70,100,50);
+sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+scene.add(sun);
+
+/* =========================
+   2. YO‘L VA TABIAT
+========================= */
+
+const ground=new THREE.Mesh(
+  new THREE.PlaneGeometry(600,3000),
+  new THREE.MeshStandardMaterial({color:0x507d39})
+);
+ground.rotation.x=-Math.PI/2;
+ground.position.set(0,-.12,-850);
+ground.receiveShadow=true;
+scene.add(ground);
+
+const road=new THREE.Mesh(
+  new THREE.PlaneGeometry(24,2400),
+  new THREE.MeshStandardMaterial({
+    color:0x777d83,
+    roughness:.95
+  })
+);
+road.rotation.x=-Math.PI/2;
+road.position.set(0,0,-850);
+road.receiveShadow=true;
+scene.add(road);
+
+/* Yo‘l chiziqlari */
+
+const whiteMat=new THREE.MeshStandardMaterial({color:0xffffff});
+
+for(let x of [-7.2,-2.4,2.4,7.2]){
+  for(let z=25;z>-2050;z-=32){
+    const line=new THREE.Mesh(
+      new THREE.BoxGeometry(.18,.035,10),
+      whiteMat
+    );
+    line.position.set(x,.025,z);
+    scene.add(line);
+  }
+}
+
+/* Yo‘l chetlari */
+
+const curbColors=[0xffffff,0xe52c32];
+
+for(let side of [-1,1]){
+  for(let z=25;z>-2050;z-=8){
+    const curb=new THREE.Mesh(
+      new THREE.BoxGeometry(1.0,.35,8),
+      new THREE.MeshStandardMaterial({
+        color:curbColors[Math.floor(Math.abs(z/8))%2]
+      })
+    );
+    curb.position.set(side*12.2,.15,z);
+    curb.castShadow=true;
+    scene.add(curb);
+  }
+
+  const rail=new THREE.Mesh(
+    new THREE.BoxGeometry(.25,.6,2200),
+    new THREE.MeshStandardMaterial({color:0xd4d8db})
+  );
+  rail.position.set(side*13,.6,-900);
+  scene.add(rail);
+}
+
+/* Tog‘lar va manzara */
+
+for(let i=0;i<95;i++){
+  const side=Math.random()<.5?-1:1;
+  const height=15+Math.random()*35;
+  const mountain=new THREE.Mesh(
+    new THREE.ConeGeometry(12+Math.random()*25,height,5),
+    new THREE.MeshStandardMaterial({
+      color:[0x71807c,0x8b8a83,0x455d3e][i%3]
+    })
+  );
+  mountain.position.set(
+    side*(30+Math.random()*90),
+    height/2-1,
+    -Math.random()*1900
+  );
+  mountain.rotation.y=Math.random()*3;
+  scene.add(mountain);
+}
+
+/* =========================
+   3. AVTOMOBIL MODELI
+========================= */
+
+function createCar(color,isPlayer=false){
+
+  const car=new THREE.Group();
+
+  const bodyMat=new THREE.MeshStandardMaterial({
+    color,
+    metalness:.45,
+    roughness:.3
+  });
+
+  const black=new THREE.MeshStandardMaterial({
+    color:0x111827,
+    roughness:.65
+  });
+
+  const glass=new THREE.MeshStandardMaterial({
+    color:0x18374a,
+    metalness:.4,
+    roughness:.2
+  });
+
+  function box(w,h,d,x,y,z,mat){
+    const m=new THREE.Mesh(
+      new THREE.BoxGeometry(w,h,d),
+      mat
+    );
+    m.position.set(x,y,z);
+    m.castShadow=true;
+    m.receiveShadow=true;
+    car.add(m);
+    return m;
+  }
+
+  /* Korpus */
+
+  box(2.25,.65,4.3,0,.7,0,bodyMat);
+
+  /* Kapot */
+
+  box(1.95,.18,1.1,0,1.03,-1.45,bodyMat);
+
+  /* Kabina */
+
+  box(1.62,.9,2.05,0,1.38,.05,glass);
+
+  /* Tom */
+
+  box(1.68,.13,1.7,0,1.85,.05,bodyMat);
+
+  /* Old va orqa oynalar */
+
+  box(1.35,.48,.07,0,1.42,-1.0,glass);
+  box(1.35,.45,.07,0,1.42,1.08,glass);
+
+  /* Orqa chiroqlar */
+
+  box(.44,.25,.08,-.79,.76,2.2,
+    new THREE.MeshStandardMaterial({color:0xff143f,emissive:0x710019})
+  );
+
+  box(.44,.25,.08,.79,.76,2.2,
+    new THREE.MeshStandardMaterial({color:0xff143f,emissive:0x710019})
+  );
+
+  /* Old chiroqlar */
+
+  box(.4,.16,.08,-.78,.8,-2.2,
+    new THREE.MeshStandardMaterial({color:0xffffdd,emissive:0x999966})
+  );
+
+  box(.4,.16,.08,.78,.8,-2.2,
+    new THREE.MeshStandardMaterial({color:0xffffdd,emissive:0x999966})
+  );
+
+  /* Raqam */
+
+  box(1,.28,.06,0,.48,2.23,
+    new THREE.MeshStandardMaterial({color:0xffffff})
+  );
+
+  /* G‘ildiraklar */
+
+  const wheelGeo=new THREE.CylinderGeometry(.43,.43,.28,20);
+
+  for(let x of [-1.12,1.12]){
+    for(let z of [-1.35,1.35]){
+      const wheel=new THREE.Mesh(wheelGeo,black);
+      wheel.rotation.z=Math.PI/2;
+      wheel.position.set(x,.42,z);
+      wheel.castShadow=true;
+      car.add(wheel);
+    }
+  }
+
+  if(isPlayer){
+    const spoiler=box(2.0,.12,.32,0,1.18,1.8,black);
+    spoiler.rotation.x=-.08;
+  }
+
+  return car;
+}
+
+/* O‘yinchi avtomobili */
+
+const player=createCar(0x079bc8,true);
+player.position.set(0,0,0);
+scene.add(player);
+
+/* =========================
+   4. BOTLAR
+========================= */
+
+const botColors=[
+  0xe83e57,
+  0x1c2bdb,
+  0xffa52c,
+  0x20b98b,
+  0x8b52dc
+];
+
+const lanes=[-8,-4,0,4,8];
+
+const bots=[];
+
+for(let i=0;i<5;i++){
+
+  const car=createCar(botColors[i]);
+
+  const bot={
+    car,
+    progress:20+i*15,
+    x:lanes[i],
+    targetX:lanes[i],
+    speed:155+Math.random()*90,
+    changeTime:2+Math.random()*4,
+    overtaken:false
+  };
+
+  car.position.set(bot.x,0,-bot.progress);
+
+  scene.add(car);
+  bots.push(bot);
+}
+
+/* Botlar harakatlanadigan yo‘laklar */
+
+function chooseLane(bot){
+  let choices=lanes.filter(l=>Math.abs(l-bot.x)>2.5);
+  bot.targetX=choices[Math.floor(Math.random()*choices.length)];
+  bot.changeTime=2+Math.random()*4;
+}
+
+/* =========================
+   5. MARRA CHIZIG‘I
+========================= */
+
+const finishGroup=new THREE.Group();
+
+for(let row=0;row<2;row++){
+  for(let col=0;col<18;col++){
+    const tile=new THREE.Mesh(
+      new THREE.BoxGeometry(24/18,.06,1.5),
+      new THREE.MeshStandardMaterial({
+        color:(row+col)%2===0?0xffffff:0x111111
+      })
+    );
+    tile.position.set(
+      -12+col*(24/18)+24/36,
+      .05,
+      -1800+row*.75
+    );
+    finishGroup.add(tile);
+  }
+}
+
+scene.add(finishGroup);
+
+/* =========================
+   6. O‘YIN HOLATI
+========================= */
+
+const FINISH_DISTANCE=1800;
+
+let mode='menu';
+let distance=0;
+let speed=0;
+let score=0;
+let nitro=100;
+let elapsed=0;
+let countdown=3;
+let countdownElapsed=0;
+let paused=false;
+let nitroActive=false;
+let muted=false;
+let cameraFar=false;
+let collisionCooldown=0;
+let overtakes=0;
+
+const keys={};
+
+function formatTime(sec){
+  const m=Math.floor(sec/60);
+  const s=Math.floor(sec%60);
+  const cs=Math.floor((sec%1)*100);
+
+  return String(m).padStart(2,'0')+':'+
+         String(s).padStart(2,'0')+'.'+
+         String(cs).padStart(2,'0');
+}
+
+function getRank(){
+  return 1+bots.filter(b=>b.progress>distance).length;
+}
+
+function updateHUD(){
+
+  const rank=getRank();
+
+  document.getElementById('position').textContent=rank+'/6';
+
+  document.getElementById('distance').textContent=
+    (distance/500).toFixed(1)+'/3.6 km';
+
+  document.getElementById('timer').textContent=
+    formatTime(elapsed);
+
+  document.getElementById('score').textContent=
+    Math.floor(score);
+
+  document.getElementById('speed').textContent=
+    Math.round(speed);
+
+  document.getElementById('nitroBar').style.width=
+    nitro+'%';
+
+  document.getElementById('nitroPercent').textContent=
+    Math.round(nitro)+'%';
+}
+
+/* =========================
+   7. OVOZ
+========================= */
+
+let audioContext;
+
+function beep(freq=400,duration=.1){
+  if(muted)return;
+
+  try{
+    audioContext=audioContext||new(
+      window.AudioContext||window.webkitAudioContext
+    )();
+
+    const oscillator=audioContext.createOscillator();
+    const gain=audioContext.createGain();
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.frequency.value=freq;
+    gain.gain.value=.04;
+
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime+duration);
+  }catch(e){}
+}
+
+/* =========================
+   8. BOSHLASH
+========================= */
+
+function resetRace(){
+
+  distance=0;
+  speed=0;
+  score=0;
+  nitro=100;
+  elapsed=0;
+  overtakes=0;
+  collisionCooldown=0;
+
+  player.position.set(0,0,0);
+  player.rotation.set(0,0,0);
+
+  for(let i=0;i<bots.length;i++){
+
+    const bot=bots[i];
+
+    bot.progress=20+i*15;
+    bot.x=lanes[i];
+    bot.targetX=lanes[i];
+    bot.speed=155+Math.random()*90;
+    bot.changeTime=2+Math.random()*4;
+    bot.overtaken=false;
+
+    bot.car.position.set(bot.x,0,-bot.progress);
+  }
+
+  document.getElementById('finishScreen').classList.add('hidden');
+  updateHUD();
+}
+
+function startRace(){
+
+  resetRace();
+
+  mode='countdown';
+  countdown=3;
+  countdownElapsed=0;
+
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('pauseScreen').classList.add('hidden');
+  document.getElementById('countdown').classList.remove('hidden');
+
+  document.querySelectorAll('.light').forEach(l=>{
+    l.classList.remove('active');
+  });
+}
+
+/* =========================
+   9. PAUZA
+========================= */
+
+function togglePause(){
+
+  if(mode!=='race'&&mode!=='paused')return;
+
+  if(mode==='race'){
+    mode='paused';
+    document.getElementById('pauseScreen').classList.remove('hidden');
+  }else{
+    mode='race';
+    document.getElementById('pauseScreen').classList.add('hidden');
+  }
+}
+
+/* =========================
+   10. BOTLAR VA TO‘QNASHUV
+========================= */
+
+function updateBots(dt){
+
+  for(const bot of bots){
+
+    const oldProgress=bot.progress;
+
+    bot.progress+=bot.speed*dt/7.2;
+
+    bot.changeTime-=dt;
+
+    if(bot.changeTime<=0){
+      chooseLane(bot);
     }
 
-    function saveNewRecord(record) {
-        const records = getRecords();
-        records.push(record);
-        records.sort((a, b) => b.wpm - a.wpm);
-        localStorage.setItem("mt_records_v1", JSON.stringify(records));
-        renderRecordsTable();
-        updateAboutStats();
+    bot.x+=(bot.targetX-bot.x)*Math.min(1,dt*1.2);
+
+    bot.car.position.set(bot.x,0,-bot.progress);
+
+    bot.car.rotation.z=
+      (bot.targetX-bot.x)*-.018;
+
+    if(bot.progress>distance+3 &&
+       bot.progress<distance+12 &&
+       !bot.overtaken){
+      bot.overtaken=true;
     }
 
-    /* =================================================================
-       4. WEB AUDIO API MECHANICAL KEY CLICK SOUND
-       ================================================================= */
-    let audioCtx = null;
-    function playClickSound(isError = false) {
-        if (!state.soundEnabled) return;
-        try {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === "suspended") audioCtx.resume();
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = isError ? "sawtooth" : "triangle";
-            osc.frequency.setValueAtTime(isError ? 160 : 520 + Math.random() * 80, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.035);
-
-            gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.04);
-        } catch (e) {}
+    if(bot.progress<distance-5){
+      bot.overtaken=false;
     }
+  }
 
-    /* =================================================================
-       5. NAVIGATION & UI CONFIGURATION
-       ================================================================= */
-    function switchView(viewName) {
-        document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
-        document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
+  /* To‘qnashuv */
 
-        document.getElementById(`view-${viewName}`).classList.add("active");
-        const navBtn = document.getElementById(`nav-${viewName}`);
-        if (navBtn) navBtn.classList.add("active");
+  if(collisionCooldown>0){
+    collisionCooldown-=dt;
+  }
 
-        const configBar = document.getElementById("test-config-bar");
-        configBar.style.display = (viewName === "test" && !state.isFinished) ? "flex" : "none";
+  for(const bot of bots){
 
-        if (viewName === "test" && !state.isFinished) {
-            focusInput();
-            setTimeout(updateCaretPosition, 20);
-        } else if (viewName === "records") {
-            renderRecordsTable();
-        } else if (viewName === "about") {
-            updateAboutStats();
-        }
+    const closeDistance=
+      Math.abs(bot.progress-distance)<3.5;
+
+    const closeX=
+      Math.abs(bot.x-player.position.x)<2.3;
+
+    if(closeDistance&&closeX&&collisionCooldown<=0){
+
+      speed*=.35;
+      score=Math.max(0,score-100);
+      collisionCooldown=1.2;
+
+      beep(100,.2);
+
+      player.position.x+=
+        player.position.x<bot.x?-1.2:1.2;
+
+      player.position.x=Math.max(-9,Math.min(9,player.position.x));
     }
+  }
+}
 
-    function renderSubOptions() {
-        const container = document.getElementById("suboptions-group");
-        const modGroup = document.getElementById("modifiers-group");
-        const div1 = document.getElementById("divider-1");
-        const div2 = document.getElementById("divider-2");
-
-        container.innerHTML = "";
-
-        if (state.mode === "time") {
-            modGroup.style.display = "flex";
-            div1.style.display = "block";
-            div2.style.display = "block";
-            [15, 30, 60, 120].forEach(sec => {
-                const btn = document.createElement("button");
-                btn.className = `config-btn ${state.timeLimit === sec ? "active" : ""}`;
-                btn.textContent = sec;
-                btn.onclick = () => { state.timeLimit = sec; renderSubOptions(); resetTest(false); };
-                container.appendChild(btn);
-            });
-        } else if (state.mode === "words") {
-            modGroup.style.display = "flex";
-            div1.style.display = "block";
-            div2.style.display = "block";
-            [10, 25, 50, 100].forEach(cnt => {
-                const btn = document.createElement("button");
-                btn.className = `config-btn ${state.wordLimit === cnt ? "active" : ""}`;
-                btn.textContent = cnt;
-                btn.onclick = () => { state.wordLimit = cnt; renderSubOptions(); resetTest(false); };
-                container.appendChild(btn);
-            });
-        } else if (state.mode === "quote") {
-            modGroup.style.display = "none";
-            div1.style.display = "none";
-            div2.style.display = "block";
-            ["all", "short", "medium", "long"].forEach(len => {
-                const btn = document.createElement("button");
-                btn.className = `config-btn ${state.quoteLength === len ? "active" : ""}`;
-                btn.textContent = len;
-                btn.onclick = () => { state.quoteLength = len; renderSubOptions(); resetTest(false); };
-                container.appendChild(btn);
-            });
-        } else if (state.mode === "zen") {
-            modGroup.style.display = "none";
-            div1.style.display = "none";
-            div2.style.display = "none";
-        } else if (state.mode === "custom") {
-            modGroup.style.display = "none";
-            div1.style.display = "none";
-            div2.style.display = "block";
-            const btn = document.createElement("button");
-            btn.className = "config-btn active";
-            btn.textContent = "matnni tahrirlash";
-            btn.onclick = () => openModal("custom-modal");
-            container.appendChild(btn);
-        }
-    }
-
-    function setMode(mode) {
-        state.mode = mode;
-        document.querySelectorAll("#modes-group .config-btn").forEach(b => {
-            b.classList.toggle("active", b.dataset.mode === mode);
-        });
-        renderSubOptions();
-        if (mode === "custom") {
-            openModal("custom-modal");
-        }
-        resetTest(false);
-    }
-
-    function toggleModifier(type) {
-        state[type] = !state[type];
-        document.getElementById(`toggle-${type}`).classList.toggle("active", state[type]);
-        resetTest(false);
-    }
-
-    /* =================================================================
-       6. WORD GENERATION & DOM RENDERING
-       ================================================================= */
-    function generateWordsList() {
-        const bank = WORD_BANKS[state.language] || WORD_BANKS.uzbek;
-        let result = [];
-
-        if (state.mode === "quote") {
-            const quotesPool = QUOTES[state.language] || QUOTES.uzbek;
-            const filtered = state.quoteLength === "all"
-                ? quotesPool
-                : quotesPool.filter(q => q.len === state.quoteLength);
-            const chosen = (filtered.length ? filtered : quotesPool)[Math.floor(Math.random() * (filtered.length || quotesPool.length))];
-            return chosen.text.split(/\s+/);
-        }
-
-        if (state.mode === "custom") {
-            return state.customText.trim().split(/\s+/).filter(Boolean);
-        }
-
-        const count = state.mode === "words" ? state.wordLimit : 110;
-        const punctuations = [".", ",", "!", "?", ";", ":"];
-
-        for (let i = 0; i < count; i++) {
-            if (state.numbers && Math.random() < 0.16) {
-                result.push(String(Math.floor(Math.random() * 999) + 1));
-                continue;
-            }
-            let w = bank[Math.floor(Math.random() * bank.length)];
-            if (state.punctuation) {
-                if (i === 0 || (result[i - 1] && /[.!?]$/.test(result[i - 1]))) {
-                    w = w.charAt(0).toUpperCase() + w.slice(1);
-                }
-                if (Math.random() < 0.22) {
-                    w += punctuations[Math.floor(Math.random() * punctuations.length)];
-                }
-            }
-            result.push(w);
-        }
-        return result;
-    }
-
-    function appendMoreWords(count = 40) {
-        const bank = WORD_BANKS[state.language] || WORD_BANKS.uzbek;
-        const container = document.getElementById("words-container");
-        for (let i = 0; i < count; i++) {
-            const w = bank[Math.floor(Math.random() * bank.length)];
-            state.words.push(w);
-            const wordDiv = createWordElement(w);
-            container.appendChild(wordDiv);
-        }
-    }
-
-    function createWordElement(wordStr) {
-        const wordDiv = document.createElement("div");
-        wordDiv.className = "word";
-        for (const ch of wordStr) {
-            const span = document.createElement("span");
-            span.className = "letter";
-            span.textContent = ch;
-            wordDiv.appendChild(span);
-        }
-        return wordDiv;
-    }
-
-    function renderWords() {
-        const container = document.getElementById("words-container");
-        const zenInput = document.getElementById("zen-input");
-        const caret = document.getElementById("caret");
-
-        container.innerHTML = "";
-        container.style.transform = "translateY(0px)";
-
-        if (state.mode === "zen") {
-            container.style.display = "none";
-            caret.style.display = "none";
-            zenInput.style.display = "block";
-            zenInput.value = "";
-            zenInput.focus();
-            return;
-        }
-
-        container.style.display = "flex";
-        caret.style.display = "block";
-        zenInput.style.display = "none";
-
-        state.words.forEach(w => {
-            container.appendChild(createWordElement(w));
-        });
-
-        updateCaretPosition();
-    }
-
-    /* =================================================================
-       7. CARET POSITIONING & LINE SCROLLING
-       ================================================================= */
-    function updateCaretPosition() {
-        if (state.mode === "zen" || state.isFinished) return;
-
-        const container = document.getElementById("words-container");
-        const caret = document.getElementById("caret");
-        const wordEls = container.querySelectorAll(".word");
-        const activeWord = wordEls[state.currentWordIdx];
-        if (!activeWord) return;
-
-        // Smooth line scroll when reaching line 3
-        const lineHeight = 46;
-        if (activeWord.offsetTop >= lineHeight * 2) {
-            const shift = activeWord.offsetTop - lineHeight;
-            container.style.transform = `translateY(-${shift}px)`;
-        }
-
-        const letters = activeWord.querySelectorAll(".letter");
-        let left = activeWord.offsetLeft;
-        let top = activeWord.offsetTop - (parseInt(container.style.transform.replace(/[^0-9-]/g, "")) || 0);
-
-        if (state.currentCharIdx < letters.length) {
-            const targetLetter = letters[state.currentCharIdx];
-            left = activeWord.offsetLeft + targetLetter.offsetLeft;
-        } else if (letters.length > 0) {
-            const lastLetter = letters[letters.length - 1];
-            left = activeWord.offsetLeft + lastLetter.offsetLeft + lastLetter.offsetWidth;
-        }
-
-        caret.style.left = `${left}px`;
-        caret.style.top = `${top + (state.caretStyle === "underline" ? 38 : 6)}px`;
-    }
-
-    /* =================================================================
-       8. CORE TYPING ENGINE & TIMER
-       ================================================================= */
-    function startTest() {
-        if (state.isRunning) return;
-        state.isRunning = true;
-        state.startTime = Date.now();
-        document.body.classList.add("focus-mode");
-        document.getElementById("caret").classList.remove("blinking");
-        document.getElementById("live-stats-bar").classList.add("visible");
-
-        state.timerInterval = setInterval(() => {
-            state.timeElapsed++;
-
-            // Calculate live WPM & Raw
-            const minutes = state.timeElapsed / 60;
-            const currentWpm = Math.round((state.correctKeystrokes / 5) / minutes) || 0;
-            const currentRaw = Math.round((state.totalKeystrokes / 5) / minutes) || 0;
-
-            state.wpmHistory.push(currentWpm);
-            state.rawHistory.push(currentRaw);
-            state.errorsPerSecond.push(state.currentSecondErrors);
-            state.currentSecondErrors = 0;
-
-            document.getElementById("live-wpm").textContent = currentWpm;
-
-            if (state.mode === "time") {
-                state.timeRemaining = Math.max(0, state.timeLimit - state.timeElapsed);
-                document.getElementById("live-counter").textContent = state.timeRemaining;
-                if (state.timeRemaining <= 0) {
-                    finishTest();
-                }
-            } else {
-                document.getElementById("live-counter").textContent =
-                    state.mode === "zen" ? `${state.timeElapsed}s` : `${state.currentWordIdx}/${state.words.length}`;
-            }
-        }, 1000);
-    }
-
-    function handleTypingInput(e) {
-        if (state.isFinished || state.mode === "zen") return;
-
-        const inputEl = document.getElementById("hidden-input");
-        const val = inputEl.value;
-        const container = document.getElementById("words-container");
-        const wordEls = container.querySelectorAll(".word");
-        const activeWordEl = wordEls[state.currentWordIdx];
-        const targetWord = state.words[state.currentWordIdx];
-
-        if (!activeWordEl || !targetWord) return;
-
-        if (!state.isRunning && val.length > 0) {
-            startTest();
-        }
-
-        // Space pressed -> submit word
-        if (val.endsWith(" ")) {
-            const typedWord = val.trim();
-            if (typedWord.length === 0) {
-                inputEl.value = "";
-                return;
-            }
-
-            playClickSound(false);
-
-            // Check if word has errors
-            const hasUnfinishedOrError = typedWord !== targetWord;
-            if (hasUnfinishedOrError) {
-                activeWordEl.classList.add("error-underline");
-            }
-
-            state.totalKeystrokes++; // space keystroke
-            if (!hasUnfinishedOrError) state.correctKeystrokes++;
-
-            state.currentWordIdx++;
-            state.currentCharIdx = 0;
-            inputEl.value = "";
-
-            // Infinite words in time mode
-            if (state.mode === "time" && state.currentWordIdx > state.words.length - 35) {
-                appendMoreWords(45);
-            }
-
-            // Update live counter for word/quote modes
-            if (state.mode !== "time") {
-                document.getElementById("live-counter").textContent = `${state.currentWordIdx}/${state.words.length}`;
-            }
-
-            // Check completion for words/quote/custom
-            if (state.mode !== "time" && state.currentWordIdx >= state.words.length) {
-                finishTest();
-                return;
-            }
-
-            updateCaretPosition();
-            return;
-        }
-
-        // Character comparison inside current word
-        const existingLetters = Array.from(activeWordEl.querySelectorAll(".letter:not(.extra)"));
-        // Remove old extra letters
-        activeWordEl.querySelectorAll(".letter.extra").forEach(el => el.remove());
-
-        const prevLen = state.currentCharIdx;
-        state.currentCharIdx = val.length;
-
-        // Track keystroke accuracy when adding a character
-        if (val.length > prevLen) {
-            const idx = val.length - 1;
-            state.totalKeystrokes++;
-            if (idx < targetWord.length && val[idx] === targetWord[idx]) {
-                state.correctKeystrokes++;
-                playClickSound(false);
-            } else {
-                state.incorrectKeystrokes++;
-                state.currentSecondErrors++;
-                playClickSound(true);
-            }
-        } else {
-            playClickSound(false);
-        }
-
-        // Paint characters
-        existingLetters.forEach((span, idx) => {
-            span.classList.remove("correct", "incorrect");
-            if (idx < val.length) {
-                if (val[idx] === targetWord[idx]) {
-                    span.classList.add("correct");
-                } else {
-                    span.classList.add("incorrect");
-                }
-            }
-        });
-
-        // Extra typed characters beyond word length
-        if (val.length > targetWord.length) {
-            const extraChars = val.slice(targetWord.length, targetWord.length + 12);
-            for (const ch of extraChars) {
-                const extraSpan = document.createElement("span");
-                extraSpan.className = "letter extra";
-                extraSpan.textContent = ch;
-                activeWordEl.appendChild(extraSpan);
-            }
-        }
-
-        // Auto-finish on last word's exact last character in words/quote/custom mode
-        if (state.mode !== "time" && state.currentWordIdx === state.words.length - 1 && val === targetWord) {
-            finishTest();
-            return;
-        }
-
-        updateCaretPosition();
-    }
-
-    function finishTest() {
-        clearInterval(state.timerInterval);
-        state.isRunning = false;
-        state.isFinished = true;
-        document.body.classList.remove("focus-mode");
-
-        const elapsedSec = Math.max(1, state.timeElapsed || Math.round((Date.now() - state.startTime) / 1000) || 1);
-        const minutes = elapsedSec / 60;
-
-        // For Zen mode calculation
-        if (state.mode === "zen") {
-            const zenText = document.getElementById("zen-input").value.trim();
-            state.correctKeystrokes = zenText.length;
-            state.totalKeystrokes = zenText.length;
-        }
-
-        const wpm = Math.round((state.correctKeystrokes / 5) / minutes);
-        const raw = Math.round((state.totalKeystrokes / 5) / minutes);
-        const acc = state.totalKeystrokes > 0
-            ? Math.max(0, Math.min(100, Math.round((state.correctKeystrokes / state.totalKeystrokes) * 100)))
-            : 100;
-
-        // Consistency calculation (coefficient of variation of WPM history)
-        let consistency = 100;
-        if (state.wpmHistory.length > 1) {
-            const avg = state.wpmHistory.reduce((a, b) => a + b, 0) / state.wpmHistory.length;
-            if (avg > 0) {
-                const variance = state.wpmHistory.reduce((sum, v) => sum + Math.pow(v - avg, 2), 0) / state.wpmHistory.length;
-                const stdDev = Math.sqrt(variance);
-                consistency = Math.max(0, Math.min(100, Math.round(100 - (stdDev / avg) * 100)));
-            }
-        }
-
-        const modeLabel = state.mode === "time" ? `time ${state.timeLimit}`
-            : state.mode === "words" ? `words ${state.wordLimit}`
-            : state.mode;
-
-        // Populate Result UI
-        document.getElementById("res-wpm").textContent = wpm;
-        document.getElementById("res-acc").textContent = `${acc}%`;
-        document.getElementById("res-type").textContent = `${modeLabel} (${state.language})`;
-        document.getElementById("res-raw").textContent = raw;
-        document.getElementById("res-chars").textContent = `${state.correctKeystrokes}/${state.incorrectKeystrokes}/0/0`;
-        document.getElementById("res-consistency").textContent = `${consistency}%`;
-        document.getElementById("res-time").textContent = `${elapsedSec}s`;
-
-        // Switch UI from arena to results
-        document.getElementById("typing-arena").style.display = "none";
-        document.getElementById("test-config-bar").style.display = "none";
-        document.getElementById("results-screen").classList.add("active");
-
-        // Ensure chart has at least 2 points
-        if (state.wpmHistory.length < 2) {
-            state.wpmHistory = [wpm, wpm];
-            state.rawHistory = [raw, raw];
-            state.errorsPerSecond = [0, state.incorrectKeystrokes];
-        }
-
-        drawResultsChart();
-
-        // Automatically record valid scores into Rekordlar
-        if (wpm > 0) {
-            const today = new Date().toISOString().split("T")[0];
-            saveNewRecord({
-                user: state.username,
-                wpm,
-                acc,
-                raw,
-                consistency,
-                mode: modeLabel,
-                date: today,
-                isUser: true
-            });
-            showToast(`Natija (${wpm} WPM) Rekordlar jadvaliga saqlandi!`);
-        }
-    }
-
-    function resetTest(keepSameWords = false) {
-        clearInterval(state.timerInterval);
-        document.body.classList.remove("focus-mode");
-
-        state.isRunning = false;
-        state.isFinished = false;
-        state.currentWordIdx = 0;
-        state.currentCharIdx = 0;
-        state.timeElapsed = 0;
-        state.timeRemaining = state.timeLimit;
-        state.wpmHistory = [];
-        state.rawHistory = [];
-        state.errorsPerSecond = [];
-        state.currentSecondErrors = 0;
-        state.totalKeystrokes = 0;
-        state.correctKeystrokes = 0;
-        state.incorrectKeystrokes = 0;
-
-        if (!keepSameWords || state.words.length === 0) {
-            state.words = generateWordsList();
-        }
-
-        document.getElementById("typing-arena").style.display = "flex";
-        document.getElementById("results-screen").classList.remove("active");
-        document.getElementById("test-config-bar").style.display = "flex";
-
-        const liveBar = document.getElementById("live-stats-bar");
-        liveBar.classList.remove("visible");
-        document.getElementById("live-wpm").textContent = "0";
-        document.getElementById("live-counter").textContent =
-            state.mode === "time" ? state.timeLimit : (state.mode === "zen" ? "0s" : `0/${state.words.length}`);
-
-        document.getElementById("caret").classList.add("blinking");
-        document.getElementById("hidden-input").value = "";
-
-        renderWords();
-        focusInput();
-    }
-
-    /* =================================================================
-       9. HTML5 CANVAS WPM LINE CHART
-       ================================================================= */
-    function drawResultsChart() {
-        const canvas = document.getElementById("wpm-chart");
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-
-        const ctx = canvas.getContext("2d");
-        ctx.scale(dpr, dpr);
-
-        const w = rect.width;
-        const h = rect.height;
-        const pad = { top: 18, right: 20, bottom: 26, left: 38 };
-        const plotW = w - pad.left - pad.right;
-        const plotH = h - pad.top - pad.bottom;
-
-        const styles = getComputedStyle(document.documentElement);
-        const mainColor = styles.getPropertyValue("--main-color").trim();
-        const subColor = styles.getPropertyValue("--sub-color").trim();
-        const errorColor = styles.getPropertyValue("--error-color").trim();
-
-        const maxVal = Math.max(40, ...state.wpmHistory, ...state.rawHistory) * 1.15;
-        const pointsCount = state.wpmHistory.length;
-
-        ctx.clearRect(0, 0, w, h);
-
-        // Horizontal grid lines & Y-axis labels
-        ctx.strokeStyle = "rgba(128,128,128,0.16)";
-        ctx.fillStyle = subColor;
-        ctx.font = "11px 'Roboto Mono', monospace";
-        ctx.textAlign = "right";
-        ctx.textBaseline = "middle";
-
-        for (let i = 0; i <= 4; i++) {
-            const val = Math.round((maxVal / 4) * i);
-            const y = pad.top + plotH - (plotH * (i / 4));
-            ctx.beginPath();
-            ctx.moveTo(pad.left, y);
-            ctx.lineTo(w - pad.right, y);
-            ctx.stroke();
-            ctx.fillText(val, pad.left - 8, y);
-        }
-
-        // X-axis second labels
-        ctx.textAlign = "center";
-        ctx.textBaseline = "top";
-        const stepX = plotW / Math.max(1, pointsCount - 1);
-        const labelSkip = Math.max(1, Math.ceil(pointsCount / 10));
-
-        for (let i = 0; i < pointsCount; i += labelSkip) {
-            const x = pad.left + i * stepX;
-            ctx.fillText(i + 1, x, pad.top + plotH + 8);
-        }
-
-        // Draw Raw WPM dashed line
-        ctx.save();
-        ctx.strokeStyle = subColor;
-        ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        state.rawHistory.forEach((val, i) => {
-            const x = pad.left + i * stepX;
-            const y = pad.top + plotH - (val / maxVal) * plotH;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-        ctx.restore();
-
-        // Draw Main WPM smooth line
-        ctx.strokeStyle = mainColor;
-        ctx.lineWidth = 2.8;
-        ctx.beginPath();
-        state.wpmHistory.forEach((val, i) => {
-            const x = pad.left + i * stepX;
-            const y = pad.top + plotH - (val / maxVal) * plotH;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-
-        // Draw WPM dots & Error markers
-        state.wpmHistory.forEach((val, i) => {
-            const x = pad.left + i * stepX;
-            const y = pad.top + plotH - (val / maxVal) * plotH;
-
-            ctx.fillStyle = mainColor;
-            ctx.beginPath();
-            ctx.arc(x, y, 3, 0, Math.PI * 2);
-            ctx.fill();
-
-            if (state.errorsPerSecond[i] > 0) {
-                ctx.fillStyle = errorColor;
-                ctx.font = "bold 12px sans-serif";
-                ctx.fillText("×", x, y - 12);
-            }
-        });
-    }
-
-    /* =================================================================
-       10. REKORDLAR TABLE & ABOUT STATS
-       ================================================================= */
-    let currentRecordFilter = "all";
-
-    function filterRecords(filterMode, btnEl) {
-        currentRecordFilter = filterMode;
-        document.querySelectorAll(".filter-tab").forEach(b => b.classList.remove("active"));
-        if (btnEl) btnEl.classList.add("active");
-        renderRecordsTable();
-    }
-
-    function renderRecordsTable() {
-        const tbody = document.getElementById("records-tbody");
-        let records = getRecords();
-
-        if (currentRecordFilter !== "all") {
-            records = records.filter(r => r.mode.startsWith(currentRecordFilter));
-        }
-
-        tbody.innerHTML = "";
-        if (records.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--sub-color);">Ushbu rejim bo'yicha hozircha rekordlar yo'q.</td></tr>`;
-            return;
-        }
-
-        records.forEach((rec, index) => {
-            const rank = index + 1;
-            const tr = document.createElement("tr");
-            if (rec.isUser) tr.className = "user-record-row";
-
-            const rankClass = rank <= 3 ? `rank-${rank}` : "";
-            tr.innerHTML = `
-                <td><span class="rank-badge ${rankClass}">${rank}</span></td>
-                <td><strong>${escapeHtml(rec.user)}</strong> ${rec.isUser ? '<span style="color:var(--main-color); font-size:0.75rem;">(siz)</span>' : ''}</td>
-                <td class="wpm-highlight">${rec.wpm}</td>
-                <td>${rec.acc}%</td>
-                <td>${rec.raw}</td>
-                <td>${rec.consistency}%</td>
-                <td>${rec.mode}</td>
-                <td style="color:var(--sub-color);">${rec.date}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function updateAboutStats() {
-        const records = getRecords();
-        const userRecords = records.filter(r => r.isUser);
-        document.getElementById("about-total-tests").textContent = userRecords.length;
-        const bestWpm = userRecords.length ? Math.max(...userRecords.map(r => r.wpm)) : 0;
-        const avgAcc = userRecords.length
-            ? Math.round(userRecords.reduce((s, r) => s + r.acc, 0) / userRecords.length)
-            : 0;
-        document.getElementById("about-best-wpm").textContent = bestWpm;
-        document.getElementById("about-avg-acc").textContent = `${avgAcc}%`;
-    }
-
-    /* =================================================================
-       11. SETTINGS, THEMES & MODALS
-       ================================================================= */
-    function renderThemes() {
-        const grid = document.getElementById("theme-grid");
-        grid.innerHTML = "";
-        THEMES.forEach(t => {
-            const btn = document.createElement("button");
-            btn.className = `theme-card ${state.theme === t.id ? "active" : ""}`;
-            btn.style.backgroundColor = t.bg;
-            btn.style.color = t.main;
-            btn.innerHTML = `
-                <span>${t.name}</span>
-                <div class="theme-dots">
-                    <span style="background:${t.main}"></span>
-                    <span style="background:${t.text}"></span>
-                </div>
-            `;
-            btn.onclick = () => applyTheme(t.id);
-            grid.appendChild(btn);
-        });
-    }
-
-    function applyTheme(themeId) {
-        state.theme = themeId;
-        document.documentElement.setAttribute("data-theme", themeId);
-        localStorage.setItem("mt_theme", themeId);
-        document.getElementById("footer-theme-name").textContent = themeId;
-        renderThemes();
-        if (state.isFinished) drawResultsChart();
-    }
-
-    function setCaretStyle(style) {
-        state.caretStyle = style;
-        localStorage.setItem("mt_caret", style);
-        const caret = document.getElementById("caret");
-        caret.classList.remove("line", "block", "underline");
-        if (style !== "line") caret.classList.add(style);
-
-        document.querySelectorAll("#caret-style-opts .opt-pill").forEach(b => {
-            b.classList.toggle("active", b.dataset.caret === style);
-        });
-        updateCaretPosition();
-    }
-
-    function toggleSmoothCaret() {
-        state.smoothCaret = !state.smoothCaret;
-        localStorage.setItem("mt_smooth", state.smoothCaret);
-        document.getElementById("caret").classList.toggle("no-smooth", !state.smoothCaret);
-        const btn = document.getElementById("btn-smooth-caret");
-        btn.classList.toggle("active", state.smoothCaret);
-        btn.textContent = `Silliq kursor: ${state.smoothCaret ? "Yoqilgan" : "O'chirilgan"}`;
-    }
-
-    function toggleSound() {
-        state.soundEnabled = !state.soundEnabled;
-        localStorage.setItem("mt_sound", state.soundEnabled);
-        const btn = document.getElementById("btn-sound-click");
-        btn.classList.toggle("active", state.soundEnabled);
-        btn.textContent = `Mexanik klaviatura ovozi: ${state.soundEnabled ? "Yoqilgan" : "O'chirilgan"}`;
-        if (state.soundEnabled) playClickSound(false);
-    }
-
-    function openModal(id) {
-        document.getElementById(id).classList.add("active");
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.remove("active");
-        if (document.getElementById("view-test").classList.contains("active") && !state.isFinished) {
-            focusInput();
-        }
-    }
-
-    function closeModalOnBackdrop(e, id) {
-        if (e.target.id === id) closeModal(id);
-    }
-
-    function openLangModal() {
-        openModal("lang-modal");
-    }
-
-    function setLanguage(lang) {
-        state.language = lang;
-        const labels = { uzbek: "o'zbekcha", english: "english", russian: "русский" };
-        document.getElementById("current-lang-label").textContent = labels[lang];
-        document.querySelectorAll(".lang-option").forEach(b => {
-            b.classList.toggle("active", b.dataset.lang === lang);
-        });
-        closeModal("lang-modal");
-        resetTest(false);
-    }
-
-    function applyCustomText() {
-        const val = document.getElementById("custom-text-input").value.trim();
-        if (val.length > 0) {
-            state.customText = val;
-        }
-        closeModal("custom-modal");
-        resetTest(false);
-    }
-
-    function openNicknameModal() {
-        document.getElementById("nickname-input").value = state.username;
-        openModal("nickname-modal");
-        setTimeout(() => document.getElementById("nickname-input").focus(), 50);
-    }
-
-    function saveNickname() {
-        const val = document.getElementById("nickname-input").value.trim();
-        if (val) {
-            state.username = val;
-            localStorage.setItem("mt_username", val);
-            document.getElementById("header-username").textContent = val;
-            showToast(`Foydalanuvchi nomi "${val}" ga o'zgartirildi`);
-        }
-        closeModal("nickname-modal");
-    }
-
-    function showToast(msg) {
-        const toast = document.getElementById("toast");
-        toast.textContent = msg;
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 3000);
-    }
-
-    function escapeHtml(str) {
-        return str.replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m]));
-    }
-
-    /* =================================================================
-       12. FOCUS MANAGEMENT & KEYBOARD SHORTCUTS
-       ================================================================= */
-    function focusInput() {
-        if (state.mode === "zen") {
-            document.getElementById("zen-input").focus();
-        } else {
-            document.getElementById("hidden-input").focus();
-        }
-        document.getElementById("blur-overlay").classList.remove("active");
-    }
-
-    const hiddenInput = document.getElementById("hidden-input");
-    hiddenInput.addEventListener("input", handleTypingInput);
-    hiddenInput.addEventListener("blur", () => {
-        if (!state.isFinished && document.getElementById("view-test").classList.contains("active")) {
-            document.getElementById("blur-overlay").classList.add("active");
-        }
+/* =========================
+   11. O‘YINNI YAKUNLASH
+========================= */
+
+function finishRace(){
+
+  mode='done';
+
+  const rank=getRank();
+  const finalScore=Math.floor(score+overtakes*300);
+
+  document.getElementById('finishTitle').textContent=
+    rank===1?'🏆 SIZ G‘OLIBSIZ!':'🏁 POYGA YAKUNLANDI';
+
+  document.getElementById('finishInfo').textContent=
+    'O‘rningiz: '+rank+'/6';
+
+  document.getElementById('finalScore').textContent=
+    'Ball: '+finalScore+' | Vaqt: '+formatTime(elapsed);
+
+  saveRecord(finalScore,rank);
+  document.getElementById('finishScreen').classList.remove('hidden');
+
+  beep(700,.4);
+}
+
+function saveRecord(points,rank){
+
+  let records=[];
+
+  try{
+    records=JSON.parse(localStorage.getItem('neon3DRecords')||'[]');
+  }catch(e){
+    records=[];
+  }
+
+  records.push({
+    score:points,
+    rank,
+    date:new Date().toLocaleDateString('uz-UZ')
+  });
+
+  records.sort((a,b)=>b.score-a.score);
+  records=records.slice(0,10);
+
+  localStorage.setItem('neon3DRecords',JSON.stringify(records));
+
+  document.getElementById('leaderboard').innerHTML=
+    records.map((r,i)=>`
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        padding:8px;
+        border-bottom:1px solid #ffffff20;
+        font-size:13px">
+        <span>${i+1}. ${r.date}</span>
+        <span>🏆 ${r.score}</span>
+      </div>
+    `).join('');
+}
+
+/* =========================
+   12. O‘YIN FIZIKASI
+========================= */
+
+function updateRace(dt){
+
+  elapsed+=dt;
+
+  const accelerating=keys.KeyW||keys.ArrowUp;
+  const braking=keys.KeyS||keys.ArrowDown;
+  const left=keys.KeyA||keys.ArrowLeft;
+  const right=keys.KeyD||keys.ArrowRight;
+
+  nitroActive=keys.Space&&nitro>0;
+
+  const maxSpeed=nitroActive?300:240;
+
+  if(accelerating){
+    speed+=115*dt;
+  }else{
+    speed-=30*dt;
+  }
+
+  if(braking){
+    speed-=180*dt;
+  }
+
+  if(nitroActive){
+
+    speed+=155*dt;
+    nitro-=34*dt;
+  }else{
+    nitro+=11*dt;
+  }
+
+  speed=Math.max(0,Math.min(maxSpeed,speed));
+  nitro=Math.max(0,Math.min(100,nitro));
+
+  /* Chap va o‘ng boshqaruv */
+
+  let steer=0;
+
+  if(left)steer=-1;
+  if(right)steer=1;
+
+  const steeringSpeed=10+(speed/240)*8;
+
+  player.position.x+=steer*steeringSpeed*dt;
+
+  player.position.x=Math.max(-9,Math.min(9,player.position.x));
+
+  player.rotation.z=-steer*.13;
+  player.rotation.y=-steer*.045;
+
+  /* Oldinga harakat */
+
+  distance+=speed*dt/7.2;
+
+  player.position.z=-distance;
+
+  /* Botlar */
+
+  updateBots(dt);
+
+  /* Ball */
+
+  score+=speed*dt*.12;
+
+  /* O‘rin va masofa */
+
+  updateHUD();
+
+  if(distance>=FINISH_DISTANCE){
+    distance=FINISH_DISTANCE;
+    updateHUD();
+    finishRace();
+  }
+}
+
+/* =========================
+   13. KAMERA
+========================= */
+
+function updateCamera(dt){
+
+  const close=cameraFar?1:0;
+
+  const cameraX=player.position.x*.55;
+  const cameraY=cameraFar?10:6.8;
+  const cameraZ=player.position.z+(cameraFar?18:12.5);
+
+  camera.position.x+=
+    (cameraX-camera.position.x)*Math.min(1,dt*4);
+
+  camera.position.y+=
+    (cameraY-camera.position.y)*Math.min(1,dt*3);
+
+  camera.position.z+=
+    (cameraZ-camera.position.z)*Math.min(1,dt*4);
+
+  camera.lookAt(
+    player.position.x*.3,
+    1.0,
+    player.position.z-12
+  );
+}
+
+/* =========================
+   14. TUGMALAR
+========================= */
+
+document.addEventListener('keydown',e=>{
+
+  keys[e.code]=true;
+
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code)){
+    e.preventDefault();
+  }
+
+  if(e.code==='Escape'||e.code==='KeyP'){
+    togglePause();
+  }
+});
+
+document.addEventListener('keyup',e=>{
+  keys[e.code]=false;
+});
+
+document.querySelectorAll('[data-key]').forEach(button=>{
+
+  const key=button.dataset.key;
+
+  button.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    keys[key==='Space'?'Space':key]=true;
+  });
+
+  ['pointerup','pointerleave','pointercancel'].forEach(event=>{
+    button.addEventListener(event,()=>{
+      keys[key==='Space'?'Space':key]=false;
     });
-    hiddenInput.addEventListener("focus", () => {
-        document.getElementById("blur-overlay").classList.remove("active");
+  });
+});
+
+document.getElementById('startBtn').onclick=startRace;
+document.getElementById('againBtn').onclick=startRace;
+
+document.getElementById('pauseBtn').onclick=togglePause;
+document.getElementById('continueBtn').onclick=togglePause;
+
+document.getElementById('cameraBtn').onclick=()=>{
+  cameraFar=!cameraFar;
+  document.getElementById('cameraBtn').textContent=
+    cameraFar?'📹 Uzoq kamera':'📹 Orqadan';
+};
+
+document.getElementById('soundBtn').onclick=()=>{
+  muted=!muted;
+  document.getElementById('soundBtn').textContent=
+    muted?'🔇':'🔊';
+};
+
+/* =========================
+   15. O‘YIN SIKLI
+========================= */
+
+let lastTime=0;
+
+function animate(now){
+
+  requestAnimationFrame(animate);
+
+  const dt=Math.min((now-lastTime)/1000,.05);
+  lastTime=now;
+
+  if(mode==='countdown'){
+
+    countdownElapsed+=dt;
+
+    const step=Math.floor(countdownElapsed);
+
+    document.getElementById('countNumber').textContent=
+      Math.max(1,3-step);
+
+    document.querySelectorAll('.light').forEach((light,i)=>{
+      light.classList.toggle('active',i<=step);
     });
 
-    // Zen mode typing listener
-    const zenInput = document.getElementById("zen-input");
-    zenInput.addEventListener("input", () => {
-        if (!state.isRunning && zenInput.value.length > 0) startTest();
-        state.correctKeystrokes = zenInput.value.length;
-        state.totalKeystrokes = zenInput.value.length;
-        playClickSound(false);
-    });
-    zenInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && e.shiftKey) {
-            e.preventDefault();
-            finishTest();
-        }
-    });
+    if(step>=3){
+      mode='race';
+      document.getElementById('countdown').classList.add('hidden');
+      beep(850,.3);
+    }
+  }
 
-    // Global Keyboard Shortcuts (Tab+Enter, Esc, CapsLock, Auto-focus)
-    let tabPressed = false;
-    window.addEventListener("keydown", (e) => {
-        // Caps Lock check
-        if (e.getModifierState) {
-            const caps = e.getModifierState("CapsLock");
-            document.getElementById("caps-warning").classList.toggle("visible", caps);
-        }
+  if(mode==='race'){
+    updateRace(dt);
+  }
 
-        // Ignore shortcuts if modal is open
-        const anyModalOpen = document.querySelector(".modal-backdrop.active");
-        if (anyModalOpen) {
-            if (e.key === "Escape") {
-                anyModalOpen.classList.remove("active");
-            }
-            return;
-        }
+  updateCamera(dt);
 
-        if (e.key === "Tab") {
-            tabPressed = true;
-            setTimeout(() => tabPressed = false, 800);
-        }
+  renderer.render(scene,camera);
+}
 
-        if ((e.key === "Enter" && tabPressed) || e.key === "Escape") {
-            if (document.getElementById("view-test").classList.contains("active")) {
-                e.preventDefault();
-                resetTest(false);
-                return;
-            }
-        }
+requestAnimationFrame(animate);
 
-        // Auto-focus hidden input when typing any character in test view
-        if (document.getElementById("view-test").classList.contains("active") && !state.isFinished) {
-            if (document.activeElement !== hiddenInput && document.activeElement !== zenInput && e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
-                focusInput();
-            }
-        }
-    });
+/* =========================
+   16. EKRAN O‘LCHAMI
+========================= */
 
-    window.addEventListener("resize", () => {
-        updateCaretPosition();
-        if (state.isFinished) drawResultsChart();
-    });
+window.addEventListener('resize',()=>{
 
-    /* =================================================================
-       13. BOOTSTRAP APPLICATION
-       ================================================================= */
-    window.onload = function () {
-        document.getElementById("header-username").textContent = state.username;
-        applyTheme(state.theme);
-        setCaretStyle(state.caretStyle);
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
 
-        // Sync toggle buttons
-        document.getElementById("caret").classList.toggle("no-smooth", !state.smoothCaret);
-        document.getElementById("btn-smooth-caret").classList.toggle("active", state.smoothCaret);
-        document.getElementById("btn-smooth-caret").textContent = `Silliq kursor: ${state.smoothCaret ? "Yoqilgan" : "O'chirilgan"}`;
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+});
 
-        document.getElementById("btn-sound-click").classList.toggle("active", state.soundEnabled);
-        document.getElementById("btn-sound-click").textContent = `Mexanik klaviatura ovozi: ${state.soundEnabled ? "Yoqilgan" : "O'chirilgan"}`;
+updateHUD();
 
-        renderSubOptions();
-        renderRecordsTable();
-        updateAboutStats();
-        resetTest(false);
-    };
 </script>
 </body>
 </html>
